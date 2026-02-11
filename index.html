@@ -252,6 +252,13 @@
         }
 
         // ─── Render orders grid ────────────────────────────────────────────
+        // Firebase stores arrays as objects with numeric keys — always normalize
+        function toArray(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            return Object.values(val);
+        }
+
         function renderOrders() {
             const grid = document.getElementById('ordersGrid');
             if (storeData.orders.length === 0) {
@@ -267,13 +274,15 @@
             const statusLabels = { pending: 'چاوەڕوان', completed: 'تەواوبوو', cancelled: 'هەڵوەشاوە' };
 
             grid.innerHTML = storeData.orders.slice().reverse().map(order => {
-                const s = statusStyles[order.status] || statusStyles.pending;
+                const s     = statusStyles[order.status] || statusStyles.pending;
+                // CRITICAL FIX: Firebase stores nested arrays as objects — normalize here
+                const items = toArray(order.items);
                 return `
                 <div class="bg-white p-6 rounded-2xl border-2 ${s.card} shadow-sm space-y-4">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h4 class="font-bold text-lg">#${order.id} - ${order.customerName}</h4>
-                            <p class="text-sm text-gray-500 mt-1">${order.phone} | ${order.location}</p>
+                            <h4 class="font-bold text-lg">#${order.id} - ${order.customerName || ''}</h4>
+                            <p class="text-sm text-gray-500 mt-1">${order.phone || ''} | ${order.location || ''}</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="px-3 py-1 rounded-full text-xs font-bold ${s.badge}">${statusLabels[order.status] || order.status}</span>
@@ -283,14 +292,14 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 p-4 rounded-xl space-y-2 text-sm border">
-                        ${order.items.map(i => `
+                        ${items.map(i => `
                             <div class="flex justify-between">
-                                <span>${i.name} × ${i.quantity}</span>
-                                <span class="font-bold">$${(i.price * i.quantity).toFixed(2)}</span>
+                                <span>${i.name || '?'} × ${i.quantity || 0}</span>
+                                <span class="font-bold">$${((i.price || 0) * (i.quantity || 0)).toFixed(2)}</span>
                             </div>
                         `).join('')}
                         <div class="pt-2 border-t flex justify-between font-bold text-indigo-600">
-                            <span>کۆی گشتی</span><span>$${parseFloat(order.total).toFixed(2)}</span>
+                            <span>کۆی گشتی</span><span>$${parseFloat(order.total || 0).toFixed(2)}</span>
                         </div>
                     </div>
                     ${order.status === 'pending' ? `
@@ -354,8 +363,9 @@
             const order = storeData.orders.find(o => o.id === oid);
             if (!order) return;
             const updatedOrders   = storeData.orders.map(o => o.id === oid ? { ...o, status } : o);
+            const orderItems = toArray(order.items);
             const updatedProducts = storeData.products.map(p => {
-                const item = order.items.find(i => i.productId === p.id);
+                const item = orderItems.find(i => i.productId === p.id);
                 if (item) {
                     if (status === 'completed') return { ...p, pending: (p.pending||0) - item.quantity, sold: (p.sold||0) + item.quantity };
                     if (status === 'cancelled')  return { ...p, pending: (p.pending||0) - item.quantity, quantity: p.quantity + item.quantity };
@@ -372,8 +382,9 @@
             if (!order) return;
             let updatedProducts = storeData.products;
             if (order.status === 'pending') {
+                const orderItems = toArray(order.items);
                 updatedProducts = storeData.products.map(p => {
-                    const item = order.items.find(i => i.productId === p.id);
+                    const item = orderItems.find(i => i.productId === p.id);
                     if (item) return { ...p, pending: Math.max(0, (p.pending||0) - item.quantity), quantity: p.quantity + item.quantity };
                     return p;
                 });
@@ -387,7 +398,7 @@
             if (!confirm('دڵنیای لە سڕینەوەی هەموو داواکارییەکان؟ ئەم کردارە گەرانەوەی نییە.')) return;
             let updatedProducts = storeData.products.map(p => ({ ...p }));
             storeData.orders.filter(o => o.status === 'pending').forEach(order => {
-                order.items.forEach(item => {
+                toArray(order.items).forEach(item => {
                     const p = updatedProducts.find(pr => pr.id === item.productId);
                     if (p) { p.pending = Math.max(0, (p.pending||0) - item.quantity); p.quantity += item.quantity; }
                 });
