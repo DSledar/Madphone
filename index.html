@@ -276,9 +276,12 @@
             </div>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4 d-flex flex-wrap gap-2 align-items-center">
             <button class="btn btn-custom btn-lg" data-bs-toggle="modal" data-bs-target="#addProductModal">
                 <i class="fas fa-plus"></i> زیادکردنی بەرهەمی نوێ
+            </button>
+            <button class="btn btn-lg btn-warning text-white" onclick="resetSalesStats()" style="border-radius:10px; border:none; padding:10px 25px; transition:all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="fas fa-undo-alt"></i> ڕیسێتکردنی فرۆشتن و قازانج
             </button>
         </div>
 
@@ -303,7 +306,12 @@
         </div>
 
         <div class="product-table mt-4">
-            <h3 class="mb-4"><i class="fas fa-shopping-bag"></i> داواکاریەکان</h3>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h3 class="mb-0"><i class="fas fa-shopping-bag"></i> داواکاریەکان</h3>
+                <button class="btn btn-danger" onclick="deleteAllOrders()" style="border-radius:10px; padding:10px 20px; transition:all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-trash-alt"></i> سڕینەوەی هەموو داواکاریەکان
+                </button>
+            </div>
             <div id="ordersContainer"></div>
         </div>
     </div>
@@ -562,10 +570,42 @@
                     if (order.status === 'pending') { statusBadge = '<span class="badge bg-warning text-dark">چاوەڕوان</span>'; statusClass = 'border-warning'; }
                     else if (order.status === 'completed') { statusBadge = '<span class="badge bg-success">تەواو بوو</span>'; statusClass = 'border-success'; }
                     else { statusBadge = '<span class="badge bg-danger">هەڵوەشاوە</span>'; statusClass = 'border-danger'; }
-                    return `<div class="order-card ${statusClass}"><div class="order-header"><div><h5 class="mb-1"><i class="fas fa-shopping-bag"></i> داواکاری #${order.id}</h5></div><div>${statusBadge}</div></div><div class="customer-info"><div class="info-item"><div class="info-label"><i class="fas fa-user"></i> ناوی کڕیار</div><div class="info-value">${order.customerName}</div></div><div class="info-item"><div class="info-label"><i class="fas fa-phone"></i> ژمارە تەلەفۆن</div><div class="info-value">${order.phone}</div></div><div class="info-item"><div class="info-label"><i class="fas fa-map-marker-alt"></i> ناونیشان</div><div class="info-value">${order.location}</div></div></div><div class="order-items"><h6 class="mb-3"><i class="fas fa-list"></i> بەرهەمەکان:</h6>${order.items.map(item => `<div class="order-item-row"><div><span class="order-item-name">${item.name}</span><br><small class="text-muted">نرخی یەک دانە: $${item.price.toFixed(2)}</small></div><div class="text-end"><span class="order-item-quantity">× ${item.quantity}</span><br><strong class="text-primary">$${(item.price * item.quantity).toFixed(2)}</strong></div></div>`).join('')}</div><div class="order-total"><div class="d-flex justify-content-between align-items-center"><h5 class="mb-0">کۆی گشتی:</h5><h4 class="mb-0">$${order.total.toFixed(2)}</h4></div></div>${order.status === 'pending' ? `<div class="mt-3 text-center"><button class="btn btn-success me-2" onclick="updateOrderStatus(${order.id}, 'completed')"><i class="fas fa-check"></i> تەواوکردن</button><button class="btn btn-danger" onclick="updateOrderStatus(${order.id}, 'cancelled')"><i class="fas fa-times"></i> هەڵوەشاندن</button></div>` : ''}</div>`;
+                    return `<div class="order-card ${statusClass}"><div class="order-header"><div><h5 class="mb-1"><i class="fas fa-shopping-bag"></i> داواکاری #${order.id}</h5></div><div class="d-flex align-items-center gap-2">${statusBadge}<button class="btn btn-sm btn-outline-danger" onclick="deleteOrder(${order.id})" title="سڕینەوەی داواکاری"><i class="fas fa-trash"></i></button></div></div><div class="customer-info"><div class="info-item"><div class="info-label"><i class="fas fa-user"></i> ناوی کڕیار</div><div class="info-value">${order.customerName}</div></div><div class="info-item"><div class="info-label"><i class="fas fa-phone"></i> ژمارە تەلەفۆن</div><div class="info-value">${order.phone}</div></div><div class="info-item"><div class="info-label"><i class="fas fa-map-marker-alt"></i> ناونیشان</div><div class="info-value">${order.location}</div></div></div><div class="order-items"><h6 class="mb-3"><i class="fas fa-list"></i> بەرهەمەکان:</h6>${order.items.map(item => `<div class="order-item-row"><div><span class="order-item-name">${item.name}</span><br><small class="text-muted">نرخی یەک دانە: $${item.price.toFixed(2)}</small></div><div class="text-end"><span class="order-item-quantity">× ${item.quantity}</span><br><strong class="text-primary">$${(item.price * item.quantity).toFixed(2)}</strong></div></div>`).join('')}</div><div class="order-total"><div class="d-flex justify-content-between align-items-center"><h5 class="mb-0">کۆی گشتی:</h5><h4 class="mb-0">$${order.total.toFixed(2)}</h4></div></div>${order.status === 'pending' ? `<div class="mt-3 text-center"><button class="btn btn-success me-2" onclick="updateOrderStatus(${order.id}, 'completed')"><i class="fas fa-check"></i> تەواوکردن</button><button class="btn btn-danger" onclick="updateOrderStatus(${order.id}, 'cancelled')"><i class="fas fa-times"></i> هەڵوەشاندن</button></div>` : ''}</div>`;
                 }).join('');
             }
         }
+
+        window.deleteOrder = function (orderId) {
+            const order = db.orders.find(o => o.id === orderId);
+            if (!order) return;
+            if (confirm('دڵنیای لە سڕینەوەی ئەم داواکاریە؟')) {
+                if (order.status === 'pending') {
+                    order.items.forEach(item => {
+                        const product = db.products.find(p => p.id === item.productId);
+                        if (product) { product.pending -= item.quantity; product.quantity += item.quantity; }
+                    });
+                }
+                db.orders = db.orders.filter(o => o.id !== orderId);
+                saveToFirebase();
+            }
+        };
+
+        window.resetSalesStats = function () {
+            if (confirm('دڵنیای لە ڕیسێتکردنی کۆی فرۆشتن و قازانج؟ ئەمە ژمارەی فرۆشراو لە هەموو بەرهەمەکان سفر دەکاتەوە و داواکاریە تەواوبووەکان دەسڕێتەوە.')) {
+                db.products.forEach(p => { p.sold = 0; p.pending = 0; });
+                db.orders = db.orders.filter(o => o.status !== 'completed');
+                saveToFirebase();
+            }
+        };
+
+        window.deleteAllOrders = function () {
+            if (db.orders.length === 0) { alert('هیچ داواکاریەک نییە بۆ سڕینەوە.'); return; }
+            if (confirm('دڵنیای لە سڕینەوەی هەموو داواکاریەکان؟ ئەم کردارە گەرانەوەی نییە.')) {
+                db.orders = [];
+                db.nextOrderId = 1;
+                saveToFirebase();
+            }
+        };
 
         loadFromFirebase();
     </script>
