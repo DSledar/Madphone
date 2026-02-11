@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Madphone - Store</title>
+    <title>Madphone - فرۆشگا</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -15,19 +14,17 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
+        @keyframes slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .animate-slide-in { animation: slide-in 0.3s ease-out; }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "react/": "https://esm.sh/react@^19.2.4/"
-  }
-}
-</script>
 </head>
 <body class="bg-gray-50 text-gray-900">
+
+    <!-- Firebase Status -->
+    <div id="firebaseStatus" class="fixed bottom-6 right-6 z-50 bg-amber-400 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+        <i data-lucide="loader" class="w-4 h-4 animate-spin"></i> چاوەڕوانی پەیوەندی...
+    </div>
+
     <!-- Navbar -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
@@ -35,7 +32,7 @@
                 <i data-lucide="shopping-bag" class="text-indigo-600 w-8 h-8"></i>
                 <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Madphone</h1>
             </div>
-            <div class="text-sm font-bold text-gray-400">فرۆشگای فەرمی</div>
+            <span class="text-sm font-bold text-gray-400">فرۆشگای فەرمی</span>
         </div>
     </nav>
 
@@ -44,59 +41,94 @@
         <section class="text-center space-y-6">
             <h2 class="text-4xl font-extrabold text-gray-900">فرۆشگای مۆبایل</h2>
             <div class="max-w-xl mx-auto relative">
-                <i data-lucide="search" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="searchInput" placeholder="گەڕان بۆ بەرهەم..." class="w-full pr-12 pl-4 py-4 rounded-2xl bg-white border-2 border-transparent focus:border-indigo-600 focus:outline-none shadow-lg transition-all">
+                <i data-lucide="search" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="گەڕان بۆ بەرهەم..."
+                    class="w-full pr-12 pl-4 py-4 rounded-2xl bg-white border-2 border-transparent focus:border-indigo-500 focus:outline-none shadow-lg transition-all"
+                >
             </div>
         </section>
 
-        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Products injected here -->
+        <!-- Loading state -->
+        <div id="loadingState" class="text-center py-20 text-gray-400">
+            <i data-lucide="loader" class="w-12 h-12 mx-auto mb-3 animate-spin opacity-40"></i>
+            <p>چاوەڕوانی بارکردنی بەرهەمەکان...</p>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 hidden"></div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="hidden text-center py-20 text-gray-400">
+            <i data-lucide="inbox" class="w-16 h-16 mx-auto mb-4 opacity-30"></i>
+            <p class="text-xl font-semibold">هیچ بەرهەمێک نەدۆزرایەوە</p>
         </div>
     </main>
 
     <!-- Floating Cart Button -->
     <button onclick="toggleModal('cartModal', true)" class="fixed bottom-8 left-8 bg-indigo-600 text-white p-5 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all z-40">
-        <i data-lucide="shopping-cart" class="w-8 h-8"></i>
+        <i data-lucide="shopping-cart" class="w-7 h-7"></i>
         <span id="cartCount" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-7 h-7 flex items-center justify-center rounded-full border-2 border-white">0</span>
     </button>
 
     <!-- Cart Modal -->
     <div id="cartModal" class="modal fixed inset-0 z-50 justify-end">
-        <div class="w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-left">
+        <div class="w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
             <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-                <h3 class="text-xl font-bold flex items-center gap-2">سەبەتەی کڕین</h3>
-                <button onclick="toggleModal('cartModal', false)"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 text-indigo-600"></i> سەبەتەی کڕین
+                </h3>
+                <button onclick="toggleModal('cartModal', false)" class="hover:bg-gray-200 p-1 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
-            <div id="cartItems" class="flex-1 overflow-y-auto p-6 space-y-4">
-                <!-- Cart items injected here -->
-            </div>
+            <div id="cartItems" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
             <div class="p-6 border-t bg-gray-50 space-y-4">
-                <div class="flex justify-between items-center"><span class="text-gray-500 font-semibold">کۆی گشتی</span><span id="cartTotal" class="text-2xl font-black text-indigo-600">$0.00</span></div>
-                <button id="checkoutBtn" onclick="openCheckout()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 disabled:bg-gray-300">بڕۆ بۆ کڕین</button>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 font-semibold">کۆی گشتی</span>
+                    <span id="cartTotal" class="text-2xl font-black text-indigo-600">$0.00</span>
+                </div>
+                <button
+                    id="checkoutBtn"
+                    onclick="openCheckout()"
+                    disabled
+                    class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                    بڕۆ بۆ کڕین
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Checkout Modal -->
     <div id="checkoutModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl p-8 space-y-6">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl p-8 space-y-5">
             <h3 class="text-2xl font-bold">تەواوکردنی داواکاری</h3>
-            <input id="custName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border" placeholder="ناوی تەواو">
-            <input id="custPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border" placeholder="ژمارەی تەلەفۆن">
-            <textarea id="custLoc" class="w-full px-4 py-3 rounded-xl bg-gray-50 border h-24" placeholder="ناونیشان"></textarea>
-            <button onclick="submitOrder()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl">ناردنی داواکاری</button>
-            <button onclick="toggleModal('checkoutModal', false)" class="w-full text-gray-400 font-bold">پاشەکشە</button>
+            <input id="custName"  class="w-full px-4 py-3 rounded-xl bg-gray-50 border focus:outline-none focus:border-indigo-400" placeholder="ناوی تەواو">
+            <input id="custPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border focus:outline-none focus:border-indigo-400" placeholder="ژمارەی تەلەفۆن">
+            <textarea id="custLoc" class="w-full px-4 py-3 rounded-xl bg-gray-50 border h-24 focus:outline-none focus:border-indigo-400" placeholder="ناونیشان"></textarea>
+            <button onclick="submitOrder()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-indigo-700 transition-colors">
+                ناردنی داواکاری
+            </button>
+            <button onclick="toggleModal('checkoutModal', false)" class="w-full text-gray-400 font-bold hover:text-gray-600 transition-colors">
+                پاشەکشە
+            </button>
         </div>
     </div>
 
     <!-- Success Modal -->
     <div id="successModal" class="modal fixed inset-0 z-[100] items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-10 text-center max-w-sm w-full">
+        <div class="bg-white rounded-3xl p-10 text-center max-w-sm w-full shadow-2xl">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500">
                 <i data-lucide="check-circle-2" class="w-12 h-12"></i>
             </div>
-            <h3 class="text-2xl font-black mb-4">داواکارییەکەت نێردرا!</h3>
-            <button onclick="toggleModal('successModal', false)" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">باشە</button>
+            <h3 class="text-2xl font-black mb-3">داواکارییەکەت نێردرا!</h3>
+            <p class="text-gray-500 mb-6 text-sm">بەرپرسی فرۆشگا زووترین کاتدا پەیوەندیت پێوە دەکات.</p>
+            <button onclick="toggleModal('successModal', false)" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors">
+                باشە
+            </button>
         </div>
     </div>
 
@@ -115,149 +147,212 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const dbRef = ref(db, '/');
+        const database = getDatabase(app);
+        const dbRef = ref(database, '/');
 
-        let storeData = { products: [], orders: [], nextOrderId: 1 };
+        let storeData = { products: [], orders: [], nextOrderId: 1, nextProductId: 1 };
         let cart = [];
 
-        // UI Helpers
+        // ─── Modal helper ─────────────────────────────────────────────────
         window.toggleModal = (id, show) => {
-            const m = document.getElementById(id);
-            m.classList.toggle('active', show);
+            document.getElementById(id).classList.toggle('active', show);
         };
 
-        // Real-time Data
+        // ─── Firebase realtime listener ───────────────────────────────────
         onValue(dbRef, (snapshot) => {
+            const statusEl = document.getElementById('firebaseStatus');
+            document.getElementById('loadingState').classList.add('hidden');
+
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 storeData = {
-                    products: data.products ? (Array.isArray(data.products) ? data.products : Object.values(data.products)) : [],
-                    orders: data.orders ? (Array.isArray(data.orders) ? data.orders : Object.values(data.orders)) : [],
-                    nextOrderId: data.nextOrderId || 1,
+                    products: data.products
+                        ? (Array.isArray(data.products) ? data.products : Object.values(data.products))
+                        : [],
+                    orders: data.orders
+                        ? (Array.isArray(data.orders) ? data.orders : Object.values(data.orders))
+                        : [],
+                    nextOrderId:   data.nextOrderId   || 1,
                     nextProductId: data.nextProductId || 1
                 };
+                statusEl.innerHTML = '<i data-lucide="wifi" class="w-4 h-4"></i> پەیوەستە';
+                statusEl.className = 'fixed bottom-6 right-6 z-50 bg-emerald-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
                 renderProducts();
+                lucide.createIcons();
+            } else {
+                statusEl.innerHTML = '<i data-lucide="wifi-off" class="w-4 h-4"></i> هیچ داتایەک نییە';
+                statusEl.className = 'fixed bottom-6 right-6 z-50 bg-red-400 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
+                document.getElementById('emptyState').classList.remove('hidden');
+                lucide.createIcons();
             }
+        }, () => {
+            document.getElementById('loadingState').classList.add('hidden');
+            const statusEl = document.getElementById('firebaseStatus');
+            statusEl.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> هەڵەی پەیوەندی';
+            statusEl.className = 'fixed bottom-6 right-6 z-50 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
+            lucide.createIcons();
         });
 
+        // ─── Render products ──────────────────────────────────────────────
         function renderProducts() {
-            const grid = document.getElementById('productGrid');
-            const search = document.getElementById('searchInput').value.toLowerCase();
+            const grid    = document.getElementById('productGrid');
+            const empty   = document.getElementById('emptyState');
+            const search  = document.getElementById('searchInput').value.toLowerCase();
             const filtered = storeData.products.filter(p => p.name.toLowerCase().includes(search));
-            
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+            grid.classList.remove('hidden');
+
             grid.innerHTML = filtered.map(p => {
-                const available = p.quantity - p.pending;
+                const available = (p.quantity || 0) - (p.pending || 0);
+                const outOfStock = available <= 0;
                 return `
-                    <div class="bg-white rounded-[2rem] overflow-hidden border shadow-sm hover:shadow-2xl transition-all group flex flex-col">
-                        <div class="aspect-square relative bg-gray-100">
-                            ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-indigo-300"><i data-lucide="smartphone" class="w-16 h-16"></i></div>`}
-                            <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-xs font-bold shadow">${available > 0 ? `${available} ماوە` : 'نەماوە'}</div>
-                        </div>
-                        <div class="p-6 space-y-4 flex-1 flex flex-col">
-                            <h4 class="text-xl font-bold">${p.name}</h4>
-                            <p class="text-sm text-gray-500 line-clamp-2">${p.description || ''}</p>
-                            <div class="mt-auto flex justify-between items-center">
-                                <span class="text-2xl font-black">$${p.price}</span>
-                                <button onclick="addToCart(${p.id})" class="p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100 hover:scale-110 transition-all ${available <= 0 ? 'opacity-50 pointer-events-none' : ''}">
-                                    <i data-lucide="plus"></i>
-                                </button>
-                            </div>
+                <div class="bg-white rounded-[2rem] overflow-hidden border shadow-sm hover:shadow-2xl transition-all group flex flex-col">
+                    <div class="aspect-square relative bg-gray-100 overflow-hidden">
+                        ${p.image
+                            ? `<img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.parentNode.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-indigo-200\'><i data-lucide=\'smartphone\' class=\'w-16 h-16\'></i></div>'">`
+                            : `<div class="w-full h-full flex items-center justify-center text-indigo-200"><i data-lucide="smartphone" class="w-16 h-16"></i></div>`
+                        }
+                        <div class="absolute top-4 right-4 ${outOfStock ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-700'} px-3 py-1 rounded-full text-xs font-bold shadow">
+                            ${outOfStock ? 'نەماوە' : `${available} ماوە`}
                         </div>
                     </div>
-                `;
+                    <div class="p-6 space-y-3 flex-1 flex flex-col">
+                        <h4 class="text-xl font-bold leading-snug">${p.name}</h4>
+                        <p class="text-sm text-gray-500 line-clamp-2 flex-1">${p.description || ''}</p>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-2xl font-black text-indigo-600">$${parseFloat(p.price).toFixed(2)}</span>
+                            <button
+                                onclick="addToCart(${p.id})"
+                                ${outOfStock ? 'disabled' : ''}
+                                class="p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:scale-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            >
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
             }).join('');
             lucide.createIcons();
         }
 
+        // ─── Cart logic ───────────────────────────────────────────────────
         window.addToCart = (id) => {
             const p = storeData.products.find(item => item.id === id);
-            const available = p.quantity - p.pending;
-            const existing = cart.find(c => c.productId === id);
-            
+            if (!p) return;
+            const available = (p.quantity || 0) - (p.pending || 0);
+            const existing  = cart.find(c => c.productId === id);
             if (existing) {
-                if (existing.quantity < available) existing.quantity++;
-                else alert('بڕی زیاتر لەمە نەماوە');
+                if (existing.quantity < available) {
+                    existing.quantity++;
+                } else {
+                    alert('بڕی زیاتر لەمە نەماوە');
+                    return;
+                }
             } else {
+                if (available <= 0) { alert('ئەم بەرهەمە نەماوە'); return; }
                 cart.push({ productId: p.id, name: p.name, price: p.price, quantity: 1 });
             }
             updateCartUI();
         };
-
-        function updateCartUI() {
-            const list = document.getElementById('cartItems');
-            const count = document.getElementById('cartCount');
-            const total = document.getElementById('cartTotal');
-            
-            list.innerHTML = cart.map(item => `
-                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border">
-                    <div class="flex-1">
-                        <h4 class="font-bold">${item.name}</h4>
-                        <p class="text-indigo-600 font-bold">$${item.price}</p>
-                        <div class="text-sm font-bold mt-1">بڕ: ${item.quantity}</div>
-                    </div>
-                    <button onclick="removeFromCart(${item.productId})" class="text-red-400"><i data-lucide="trash-2"></i></button>
-                </div>
-            `).join('');
-
-            const sum = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
-            
-            total.textContent = `$${sum.toFixed(2)}`;
-            count.textContent = totalQty;
-            count.classList.toggle('hidden', totalQty === 0);
-            document.getElementById('checkoutBtn').disabled = cart.length === 0;
-            lucide.createIcons();
-        }
 
         window.removeFromCart = (id) => {
             cart = cart.filter(i => i.productId !== id);
             updateCartUI();
         };
 
+        function updateCartUI() {
+            const list     = document.getElementById('cartItems');
+            const countEl  = document.getElementById('cartCount');
+            const totalEl  = document.getElementById('cartTotal');
+            const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
+            const sum      = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-16 text-gray-400">
+                        <i data-lucide="shopping-cart" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
+                        <p>سەبەتەکەت بەتاڵە</p>
+                    </div>`;
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border">
+                        <div class="flex-1">
+                            <h4 class="font-bold">${item.name}</h4>
+                            <p class="text-indigo-600 font-bold">$${parseFloat(item.price).toFixed(2)}</p>
+                            <p class="text-sm text-gray-500 mt-1">بڕ: ${item.quantity} | کۆ: $${(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                        <button onclick="removeFromCart(${item.productId})" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            totalEl.textContent = `$${sum.toFixed(2)}`;
+            countEl.textContent = totalQty;
+            countEl.classList.toggle('hidden', totalQty === 0);
+            document.getElementById('checkoutBtn').disabled = cart.length === 0;
+            lucide.createIcons();
+        }
+
         window.openCheckout = () => {
             toggleModal('cartModal', false);
             toggleModal('checkoutModal', true);
         };
 
+        // ─── Submit order ──────────────────────────────────────────────────
         window.submitOrder = async () => {
-            const name = document.getElementById('custName').value;
-            const phone = document.getElementById('custPhone').value;
-            const loc = document.getElementById('custLoc').value;
+            const name  = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const loc   = document.getElementById('custLoc').value.trim();
 
-            if(!name || !phone || !loc) return alert('هەموو خانەکان پڕبکەرەوە');
+            if (!name || !phone || !loc) return alert('تکایە هەموو خانەکان پڕبکەرەوە');
+            if (cart.length === 0) return alert('سەبەتەکەت بەتاڵە');
 
             const order = {
-                id: storeData.nextOrderId,
+                id:           storeData.nextOrderId,
                 customerName: name,
-                phone: phone,
-                location: loc,
-                items: cart,
-                total: cart.reduce((s, i) => s + (i.price * i.quantity), 0),
-                status: 'pending',
-                date: new Date().toISOString()
+                phone,
+                location:     loc,
+                items:        cart,
+                total:        cart.reduce((s, i) => s + (i.price * i.quantity), 0),
+                status:       'pending',
+                date:         new Date().toISOString()
             };
 
+            // Deduct stock and mark as pending
             const updatedProducts = storeData.products.map(p => {
                 const ci = cart.find(item => item.productId === p.id);
-                return ci ? { ...p, quantity: p.quantity - ci.quantity, pending: p.pending + ci.quantity } : p;
+                return ci ? { ...p, quantity: p.quantity - ci.quantity, pending: (p.pending || 0) + ci.quantity } : p;
             });
 
             await set(dbRef, {
                 ...storeData,
-                products: updatedProducts,
-                orders: [...storeData.orders, order],
+                products:    updatedProducts,
+                orders:      [...storeData.orders, order],
                 nextOrderId: storeData.nextOrderId + 1
             });
 
             cart = [];
             updateCartUI();
+            document.getElementById('custName').value  = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('custLoc').value   = '';
             toggleModal('checkoutModal', false);
             toggleModal('successModal', true);
         };
 
+        // ─── Search ────────────────────────────────────────────────────────
         document.getElementById('searchInput').addEventListener('input', renderProducts);
+
         lucide.createIcons();
+        updateCartUI();
     </script>
 </body>
 </html>
