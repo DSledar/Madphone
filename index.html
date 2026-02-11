@@ -1,384 +1,105 @@
+
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mad Phone - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Madphone - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap');
-
-        * {
-            font-family: 'Noto Sans Arabic', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .dashboard-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stats-card i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .product-table {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .btn-custom {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-
-        .btn-custom:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            color: white;
-        }
-
-        .modal-content {
-            border-radius: 20px;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 10px;
-            border: 2px solid #e0e0e0;
-            padding: 12px;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        .table {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .badge-status {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .low-stock {
-            background: #ff6b6b;
-            color: white;
-        }
-
-        .in-stock {
-            background: #51cf66;
-            color: white;
-        }
-
-        .out-stock {
-            background: #868e96;
-            color: white;
-        }
-
-        .nav-link-custom {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
-
-        .firebase-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #51cf66;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        .order-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .order-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: #667eea;
-        }
-
-        .order-header {
-            display: flex;
-           position:  justify-content-between;
-            align-items: center;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-            margin-bottom: 15px;
-        }
-
-        .order-items {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .order-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .order-item-row:last-child {
-            border-bottom: none;
-        }
-
-        .order-item-name {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .order-item-quantity {
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .order-total {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .customer-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
-        }
-
-        .info-item {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 8px;
-        }
-
-        .info-label {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            font-weight: 600;
-            color: #333;
-        }
+        body { font-family: 'Noto Sans Arabic', sans-serif; background-color: #f9fafb; }
+        .modal { display: none; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
     </style>
 </head>
-
-<body>
-    <div class="firebase-status" id="firebaseStatus">
-        <i class="fas fa-sync fa-spin"></i> چاوەڕوانی پەیوەندی...
-    </div>
-
-    <a href="https://dsledar.github.io/Madphone/store.html" class="btn btn-custom nav-link-custom">
-        <i class="fas fa-store"></i> بڕۆ بۆ فرۆشگا
-    </a>
-
-    <div class="dashboard-container">
-        <div class="header">
-            <h1><i class="fas fa-mobile-alt"></i> MadPhone</h1>
-            <p class="mb-0">بەڕێوەبردنی کۆگا - Addmin</p>
+<body class="text-gray-900">
+    <!-- Nav -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-2 border-purple-100">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="shield" class="text-purple-600 w-8 h-8"></i>
+                <h1 class="text-2xl font-bold text-purple-900">Madphone Admin</h1>
+            </div>
+            <span class="bg-purple-50 text-purple-600 px-4 py-1 rounded-full text-sm font-bold border border-purple-100">سەرپەرشتیار</span>
         </div>
+    </nav>
 
-        <div class="row">
-            <div class="col-md-3">
-                <div class="stats-card text-center"><i class="fas fa-boxes"></i>
-                    <h3 id="totalProducts">0</h3>
-                    <p class="mb-0">کۆی بەرهەمەکان</p>
-                </div>
+    <main class="max-w-7xl mx-auto px-4 mt-8 space-y-10 pb-20">
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
+                <div class="p-4 rounded-xl bg-indigo-50 text-indigo-600"><i data-lucide="package"></i></div>
+                <div><p class="text-gray-400 text-sm">بەرهەم</p><h4 id="statProducts" class="text-2xl font-bold">0</h4></div>
             </div>
-            <div class="col-md-3">
-                <div class="stats-card text-center"><i class="fas fa-shopping-cart"></i>
-                    <h3 id="totalOrders">0</h3>
-                    <p class="mb-0">داواکاریەکان</p>
-                </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
+                <div class="p-4 rounded-xl bg-blue-50 text-blue-600"><i data-lucide="shopping-cart"></i></div>
+                <div><p class="text-gray-400 text-sm">داواکاری</p><h4 id="statOrders" class="text-2xl font-bold">0</h4></div>
             </div>
-            <div class="col-md-3">
-                <div class="stats-card text-center"><i class="fas fa-clock"></i>
-                    <h3 id="pendingOrders">0</h3>
-                    <p class="mb-0">داواکاری چاوەڕوان</p>
-                </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
+                <div class="p-4 rounded-xl bg-amber-50 text-amber-600"><i data-lucide="clock"></i></div>
+                <div><p class="text-gray-400 text-sm">چاوەڕوان</p><h4 id="statPending" class="text-2xl font-bold">0</h4></div>
             </div>
-            <div class="col-md-3">
-                <div class="stats-card text-center"><i class="fas fa-dollar-sign"></i>
-                    <h3 id="totalRevenue">$0</h3>
-                    <p class="mb-0">کۆی داهات</p>
-                </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
+                <div class="p-4 rounded-xl bg-emerald-50 text-emerald-600"><i data-lucide="dollar-sign"></i></div>
+                <div><p class="text-gray-400 text-sm">داهات</p><h4 id="statRevenue" class="text-2xl font-bold">$0</h4></div>
             </div>
         </div>
 
-        <div class="mt-4 d-flex flex-wrap gap-2 align-items-center">
-            <button class="btn btn-custom btn-lg" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                <i class="fas fa-plus"></i> زیادکردنی بەرهەمی نوێ
-            </button>
-            <button class="btn btn-lg btn-warning text-white" onclick="resetSalesStats()" style="border-radius:10px; border:none; padding:10px 25px; transition:all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                <i class="fas fa-undo-alt"></i> ڕیسێتکردنی فرۆشتن و قازانج
-            </button>
-        </div>
-
-        <div class="product-table">
-            <h3 class="mb-4"><i class="fas fa-list"></i> لیستی بەرهەمەکان</h3>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>ناوی بەرهەم</th>
-                            <th>نرخ</th>
-                            <th>بڕی ماوە</th>
-                            <th>فرۆشراو</th>
-                            <th>چاوەڕوان</th>
-                            <th>دۆخ</th>
-                            <th>کردارەکان</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="product-table mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                <h3 class="mb-0"><i class="fas fa-shopping-bag"></i> داواکاریەکان</h3>
-                <button class="btn btn-danger" onclick="deleteAllOrders()" style="border-radius:10px; padding:10px 20px; transition:all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                    <i class="fas fa-trash-alt"></i> سڕینەوەی هەموو داواکاریەکان
+        <!-- Products Table -->
+        <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+            <div class="p-6 border-b flex justify-between items-center bg-gray-50/50">
+                <h3 class="text-xl font-bold flex items-center gap-2"><i data-lucide="package" class="text-purple-600"></i> لیستەی بەرهەمەکان</h3>
+                <button onclick="toggleModal('productModal', true)" class="bg-purple-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-lg shadow-purple-100">
+                    <i data-lucide="plus" class="w-4 h-4"></i> زیادکردنی بەرهەم
                 </button>
             </div>
-            <div id="ordersContainer"></div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="addProductModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">زیادکردنی بەرهەمی نوێ</h5><button type="button" class="btn-close"
-                        data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addProductForm">
-                        <div class="mb-3"><label class="form-label">ناوی بەرهەم</label><input type="text"
-                                class="form-control" id="productName" required></div>
-                        <div class="mb-3"><label class="form-label">نرخ ($)</label><input type="number"
-                                class="form-control" id="productPrice" step="0.01" required></div>
-                        <div class="mb-3"><label class="form-label">بڕ</label><input type="number" class="form-control"
-                                id="productQuantity" required></div>
-                        <div class="mb-3"><label class="form-label">وەسف</label><textarea class="form-control"
-                                id="productDescription" rows="3"></textarea></div>
-                        <div class="mb-3"><label class="form-label">وێنەی بەرهەم</label><input type="file"
-                                class="form-control" id="productImage" accept="image/*"><small class="text-muted">کەمتر
-                                لە 500KB</small></div>
-                        <div id="imagePreview" class="mt-2"></div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">داخستن</button>
-                    <button type="button" class="btn btn-custom" onclick="addProduct()">زیادکردن</button>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right">
+                    <thead class="bg-gray-50 text-gray-500 text-sm font-bold border-b">
+                        <tr>
+                            <th class="p-4">بەرهەم</th>
+                            <th class="p-4">نرخ</th>
+                            <th class="p-4">بڕی کۆگا</th>
+                            <th class="p-4">فرۆشراو</th>
+                            <th class="p-4">کردارەکان</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody" class="divide-y">
+                        <!-- Products injected here -->
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="modal fade" id="editProductModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">دەستکاریکردنی بەرهەم</h5><button type="button" class="btn-close"
-                        data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editProductForm">
-                        <input type="hidden" id="editProductId">
-                        <div class="mb-3"><label class="form-label">ناوی بەرهەم</label><input type="text"
-                                class="form-control" id="editProductName" required></div>
-                        <div class="mb-3"><label class="form-label">نرخ ($)</label><input type="number"
-                                class="form-control" id="editProductPrice" step="0.01" required></div>
-                        <div class="mb-3"><label class="form-label">بڕ</label><input type="number" class="form-control"
-                                id="editProductQuantity" required></div>
-                        <div class="mb-3"><label class="form-label">وەسف</label><textarea class="form-control"
-                                id="editProductDescription" rows="3"></textarea></div>
-                        <div class="mb-3"><label class="form-label">وێنەی نوێ</label><input type="file"
-                                class="form-control" id="editProductImage" accept="image/*"></div>
-                        <div id="editImagePreview" class="mt-2"></div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">داخستن</button>
-                    <button type="button" class="btn btn-custom" onclick="updateProduct()">نوێکردنەوە</button>
-                </div>
+        <!-- Orders Section -->
+        <section class="space-y-6">
+            <h3 class="text-xl font-bold flex items-center gap-2"><i data-lucide="shopping-cart" class="text-blue-600"></i> داواکارییەکان</h3>
+            <div id="ordersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Orders injected here -->
             </div>
+        </section>
+    </main>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl p-8 space-y-4">
+            <h3 id="modalTitle" class="text-2xl font-bold">زیادکردنی بەرهەم</h3>
+            <input id="prodName" class="w-full p-3 border rounded-xl" placeholder="ناوی بەرهەم">
+            <div class="grid grid-cols-2 gap-4">
+                <input id="prodPrice" type="number" class="w-full p-3 border rounded-xl" placeholder="نرخ $">
+                <input id="prodQty" type="number" class="w-full p-3 border rounded-xl" placeholder="بڕی کۆگا">
+            </div>
+            <textarea id="prodDesc" class="w-full p-3 border rounded-xl h-24" placeholder="وەسفی کورت"></textarea>
+            <input id="prodImg" class="w-full p-3 border rounded-xl" placeholder="لینکی وێنە (URL)">
+            <button onclick="saveProduct()" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-xl">پاشەکەوتکردن</button>
+            <button onclick="closeProductModal()" class="w-full text-gray-400">داخستن</button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -394,221 +115,155 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        let db = { products: [], orders: [], nextProductId: 1, nextOrderId: 1 };
+        const db = getDatabase(app);
+        const dbRef = ref(db, '/');
 
-        function loadFromFirebase() {
-            const dbRef = ref(database, '/');
-            onValue(dbRef, (snapshot) => {
-                const status = document.getElementById('firebaseStatus');
-                status.innerHTML = '<i class="fas fa-check-circle"></i> پەیوەست بە Firebase';
-                if (snapshot.exists()) {
-                    db = snapshot.val();
-                } else {
-                    db = {
-                        products: [
-                            { id: 1, name: 'ئایفۆن 15 پرۆ', price: 999, quantity: 50, sold: 0, pending: 0, description: 'مۆبایلی ئایفۆنی نوێترین', image: null },
-                            { id: 2, name: 'سامسۆنگ S24', price: 899, quantity: 40, sold: 0, pending: 0, description: 'مۆبایلی سامسۆنگی نوێترین', image: null }
-                        ],
-                        orders: [],
-                        nextProductId: 3,
-                        nextOrderId: 1
-                    };
-                    saveToFirebase();
-                }
-                updateDisplay();
-            }, (error) => {
-                document.getElementById('firebaseStatus').innerHTML = '<i class="fas fa-times-circle"></i> هەڵە';
-                document.getElementById('firebaseStatus').style.background = '#ff6b6b';
-                alert('هەڵە لە پەیوەندی بە Firebase. تکایە دڵنیابەرەوە Realtime Database دروستکراوە!');
-            });
-        }
+        let storeData = { products: [], orders: [], nextOrderId: 1, nextProductId: 1 };
+        let editingId = null;
 
-        function saveToFirebase() {
-            set(ref(database, '/'), db);
-        }
+        window.toggleModal = (id, show) => {
+            document.getElementById(id).classList.toggle('active', show);
+        };
 
-        document.getElementById('productImage').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file && file.size > 500000) {
-                alert('وێنەکە زۆر گەورەیە! کەمتر لە 500KB');
-                this.value = '';
-                return;
-            }
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="max-width: 200px;">`;
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.getElementById('editProductImage').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file && file.size > 500000) {
-                alert('وێنەکە زۆر گەورەیە! کەمتر لە 500KB');
-                this.value = '';
-                return;
-            }
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => document.getElementById('editImagePreview').innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="max-width: 200px;">`;
-                reader.readAsDataURL(file);
-            }
-        });
-
-        window.addProduct = function () {
-            const name = document.getElementById('productName').value;
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const quantity = parseInt(document.getElementById('productQuantity').value);
-            const description = document.getElementById('productDescription').value;
-            const imageFile = document.getElementById('productImage').files[0];
-
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    db.products.push({ id: db.nextProductId++, name, price, quantity, sold: 0, pending: 0, description, image: e.target.result });
-                    saveToFirebase();
-                    bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
-                    document.getElementById('addProductForm').reset();
-                    document.getElementById('imagePreview').innerHTML = '';
+        onValue(dbRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                storeData = {
+                    products: data.products ? (Array.isArray(data.products) ? data.products : Object.values(data.products)) : [],
+                    orders: data.orders ? (Array.isArray(data.orders) ? data.orders : Object.values(data.orders)) : [],
+                    nextOrderId: data.nextOrderId || 1,
+                    nextProductId: data.nextProductId || 1
                 };
-                reader.readAsDataURL(imageFile);
-            } else {
-                db.products.push({ id: db.nextProductId++, name, price, quantity, sold: 0, pending: 0, description, image: null });
-                saveToFirebase();
-                bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
-                document.getElementById('addProductForm').reset();
+                updateDashboard();
             }
-        };
+        });
 
-        window.editProduct = function (id) {
-            const product = db.products.find(p => p.id === id);
-            if (product) {
-                document.getElementById('editProductId').value = product.id;
-                document.getElementById('editProductName').value = product.name;
-                document.getElementById('editProductPrice').value = product.price;
-                document.getElementById('editProductQuantity').value = product.quantity;
-                document.getElementById('editProductDescription').value = product.description;
-                document.getElementById('editImagePreview').innerHTML = product.image ? `<img src="${product.image}" class="img-thumbnail" style="max-width: 200px;">` : '';
-                new bootstrap.Modal(document.getElementById('editProductModal')).show();
-            }
-        };
+        function updateDashboard() {
+            document.getElementById('statProducts').textContent = storeData.products.length;
+            document.getElementById('statOrders').textContent = storeData.orders.length;
+            document.getElementById('statPending').textContent = storeData.orders.filter(o => o.status === 'pending').length;
+            const rev = storeData.orders.filter(o => o.status === 'completed').reduce((s, o) => s + o.total, 0);
+            document.getElementById('statRevenue').textContent = `$${rev.toFixed(2)}`;
 
-        window.updateProduct = function () {
-            const id = parseInt(document.getElementById('editProductId').value);
-            const product = db.products.find(p => p.id === id);
-            if (product) {
-                product.name = document.getElementById('editProductName').value;
-                product.price = parseFloat(document.getElementById('editProductPrice').value);
-                product.quantity = parseInt(document.getElementById('editProductQuantity').value);
-                product.description = document.getElementById('editProductDescription').value;
-                const imageFile = document.getElementById('editProductImage').files[0];
-                if (imageFile) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        product.image = e.target.result;
-                        saveToFirebase();
-                        bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
-                    };
-                    reader.readAsDataURL(imageFile);
-                } else {
-                    saveToFirebase();
-                    bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
-                }
-            }
-        };
-
-        window.deleteProduct = function (id) {
-            if (confirm('دڵنیای لە سڕینەوە؟')) {
-                db.products = db.products.filter(p => p.id !== id);
-                saveToFirebase();
-            }
-        };
-
-        window.updateOrderStatus = function (orderId, status) {
-            const order = db.orders.find(o => o.id === orderId);
-            if (order) {
-                const oldStatus = order.status;
-                order.status = status;
-                if (oldStatus === 'pending' && status === 'completed') {
-                    order.items.forEach(item => {
-                        const product = db.products.find(p => p.id === item.productId);
-                        if (product) { product.pending -= item.quantity; product.sold += item.quantity; }
-                    });
-                } else if (oldStatus === 'pending' && status === 'cancelled') {
-                    order.items.forEach(item => {
-                        const product = db.products.find(p => p.id === item.productId);
-                        if (product) { product.pending -= item.quantity; product.quantity += item.quantity; }
-                    });
-                }
-                saveToFirebase();
-            }
-        };
-
-        function updateDisplay() {
-            document.getElementById('totalProducts').textContent = db.products.length;
-            document.getElementById('totalOrders').textContent = db.orders.length;
-            document.getElementById('pendingOrders').textContent = db.orders.filter(o => o.status === 'pending').length;
-            const revenue = db.orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total, 0);
-            document.getElementById('totalRevenue').textContent = '$' + revenue.toFixed(2);
-
-            document.getElementById('productTableBody').innerHTML = db.products.map(p => {
-                const available = p.quantity - p.pending;
-                let statusClass = 'in-stock', statusText = 'لە کۆگادایە';
-                if (available === 0) { statusClass = 'out-stock'; statusText = 'تەواو بووە'; }
-                else if (available < 10) { statusClass = 'low-stock'; statusText = 'کەمە'; }
-                const imageDisplay = p.image ? `<img src="${p.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-left: 10px;">` : '<i class="fas fa-image text-muted" style="font-size: 2rem; margin-left: 10px;"></i>';
-                return `<tr><td><div class="d-flex align-items-center">${imageDisplay}<strong>${p.name}</strong></div></td><td>$${p.price.toFixed(2)}</td><td>${available}</td><td>${p.sold}</td><td>${p.pending}</td><td><span class="badge-status ${statusClass}">${statusText}</span></td><td><button class="btn btn-sm btn-primary" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button></td></tr>`;
-            }).join('');
-
-            const ordersContainer = document.getElementById('ordersContainer');
-            if (db.orders.length === 0) {
-                ordersContainer.innerHTML = '<p class="text-center text-muted">هیچ داواکاریەک نییە</p>';
-            } else {
-                ordersContainer.innerHTML = db.orders.map(order => {
-                    let statusBadge = '', statusClass = '';
-                    if (order.status === 'pending') { statusBadge = '<span class="badge bg-warning text-dark">چاوەڕوان</span>'; statusClass = 'border-warning'; }
-                    else if (order.status === 'completed') { statusBadge = '<span class="badge bg-success">تەواو بوو</span>'; statusClass = 'border-success'; }
-                    else { statusBadge = '<span class="badge bg-danger">هەڵوەشاوە</span>'; statusClass = 'border-danger'; }
-                    return `<div class="order-card ${statusClass}"><div class="order-header"><div><h5 class="mb-1"><i class="fas fa-shopping-bag"></i> داواکاری #${order.id}</h5></div><div class="d-flex align-items-center gap-2">${statusBadge}<button class="btn btn-sm btn-outline-danger" onclick="deleteOrder(${order.id})" title="سڕینەوەی داواکاری"><i class="fas fa-trash"></i></button></div></div><div class="customer-info"><div class="info-item"><div class="info-label"><i class="fas fa-user"></i> ناوی کڕیار</div><div class="info-value">${order.customerName}</div></div><div class="info-item"><div class="info-label"><i class="fas fa-phone"></i> ژمارە تەلەفۆن</div><div class="info-value">${order.phone}</div></div><div class="info-item"><div class="info-label"><i class="fas fa-map-marker-alt"></i> ناونیشان</div><div class="info-value">${order.location}</div></div></div><div class="order-items"><h6 class="mb-3"><i class="fas fa-list"></i> بەرهەمەکان:</h6>${order.items.map(item => `<div class="order-item-row"><div><span class="order-item-name">${item.name}</span><br><small class="text-muted">نرخی یەک دانە: $${item.price.toFixed(2)}</small></div><div class="text-end"><span class="order-item-quantity">× ${item.quantity}</span><br><strong class="text-primary">$${(item.price * item.quantity).toFixed(2)}</strong></div></div>`).join('')}</div><div class="order-total"><div class="d-flex justify-content-between align-items-center"><h5 class="mb-0">کۆی گشتی:</h5><h4 class="mb-0">$${order.total.toFixed(2)}</h4></div></div>${order.status === 'pending' ? `<div class="mt-3 text-center"><button class="btn btn-success me-2" onclick="updateOrderStatus(${order.id}, 'completed')"><i class="fas fa-check"></i> تەواوکردن</button><button class="btn btn-danger" onclick="updateOrderStatus(${order.id}, 'cancelled')"><i class="fas fa-times"></i> هەڵوەشاندن</button></div>` : ''}</div>`;
-                }).join('');
-            }
+            renderProducts();
+            renderOrders();
         }
 
-        window.deleteOrder = function (orderId) {
-            const order = db.orders.find(o => o.id === orderId);
-            if (!order) return;
-            if (confirm('دڵنیای لە سڕینەوەی ئەم داواکاریە؟')) {
-                if (order.status === 'pending') {
-                    order.items.forEach(item => {
-                        const product = db.products.find(p => p.id === item.productId);
-                        if (product) { product.pending -= item.quantity; product.quantity += item.quantity; }
-                    });
+        function renderProducts() {
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = storeData.products.map(p => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="p-4 font-bold">${p.name}</td>
+                    <td class="p-4 text-purple-600 font-bold">$${p.price}</td>
+                    <td class="p-4">${p.quantity}</td>
+                    <td class="p-4 text-green-600 font-bold">${p.sold || 0}</td>
+                    <td class="p-4">
+                        <div class="flex gap-2">
+                            <button onclick="editProduct(${p.id})" class="text-blue-500 p-2 hover:bg-blue-50 rounded-lg"><i data-lucide="edit"></i></button>
+                            <button onclick="deleteProduct(${p.id})" class="text-red-500 p-2 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderOrders() {
+            const grid = document.getElementById('ordersGrid');
+            grid.innerHTML = storeData.orders.slice().reverse().map(order => `
+                <div class="bg-white p-6 rounded-2xl border-2 ${order.status === 'pending' ? 'border-amber-100 bg-amber-50/10' : 'border-gray-100'} shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="font-bold text-lg">#${order.id} - ${order.customerName}</h4>
+                            <p class="text-sm text-gray-500">${order.phone} | ${order.location}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${order.status === 'pending' ? 'bg-amber-100 text-amber-700' : (order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')}">${order.status}</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl space-y-2 text-sm border">
+                        ${order.items.map(i => `<div class="flex justify-between"><span>${i.name} x${i.quantity}</span><span class="font-bold">$${i.price * i.quantity}</span></div>`).join('')}
+                        <div class="pt-2 border-t flex justify-between font-bold text-indigo-600"><span>کۆی گشتی</span><span>$${order.total}</span></div>
+                    </div>
+                    ${order.status === 'pending' ? `
+                        <div class="mt-4 flex gap-3">
+                            <button onclick="updateOrderStatus(${order.id}, 'completed')" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-bold flex items-center justify-center gap-2"><i data-lucide="check"></i> تەواوکردن</button>
+                            <button onclick="updateOrderStatus(${order.id}, 'cancelled')" class="flex-1 bg-red-500 text-white py-2 rounded-xl font-bold flex items-center justify-center gap-2"><i data-lucide="x"></i> هەڵوەشاندن</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.saveProduct = async () => {
+            const name = document.getElementById('prodName').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const qty = parseInt(document.getElementById('prodQty').value);
+            const desc = document.getElementById('prodDesc').value;
+            const img = document.getElementById('prodImg').value;
+
+            if(!name || isNaN(price)) return alert('ناوی بەرهەم و نرخ بنووسە');
+
+            let updatedProducts;
+            let nextPid = storeData.nextProductId;
+
+            if(editingId) {
+                updatedProducts = storeData.products.map(p => p.id === editingId ? { ...p, name, price, quantity: qty, description: desc, image: img } : p);
+            } else {
+                const newP = { id: nextPid, name, price, quantity: qty, sold: 0, pending: 0, description: desc, image: img };
+                updatedProducts = [...storeData.products, newP];
+                nextPid++;
+            }
+
+            await set(dbRef, { ...storeData, products: updatedProducts, nextProductId: nextPid });
+            closeProductModal();
+        };
+
+        window.editProduct = (id) => {
+            const p = storeData.products.find(item => item.id === id);
+            editingId = id;
+            document.getElementById('modalTitle').textContent = 'دەستکاریکردنی بەرهەم';
+            document.getElementById('prodName').value = p.name;
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodQty').value = p.quantity;
+            document.getElementById('prodDesc').value = p.description || '';
+            document.getElementById('prodImg').value = p.image || '';
+            toggleModal('productModal', true);
+        };
+
+        window.closeProductModal = () => {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'زیادکردنی بەرهەم';
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodQty').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImg').value = '';
+            toggleModal('productModal', false);
+        };
+
+        window.deleteProduct = async (id) => {
+            if(!confirm('دڵنیای لە سڕینەوە؟')) return;
+            const updated = storeData.products.filter(p => p.id !== id);
+            await set(dbRef, { ...storeData, products: updated });
+        };
+
+        window.updateOrderStatus = async (oid, status) => {
+            const order = storeData.orders.find(o => o.id === oid);
+            const updatedOrders = storeData.orders.map(o => o.id === oid ? { ...o, status } : o);
+            
+            const updatedProducts = storeData.products.map(p => {
+                const item = order.items.find(i => i.productId === p.id);
+                if(item) {
+                    if(status === 'completed') return { ...p, pending: p.pending - item.quantity, sold: (p.sold || 0) + item.quantity };
+                    if(status === 'cancelled') return { ...p, pending: p.pending - item.quantity, quantity: p.quantity + item.quantity };
                 }
-                db.orders = db.orders.filter(o => o.id !== orderId);
-                saveToFirebase();
-            }
+                return p;
+            });
+
+            await set(dbRef, { ...storeData, orders: updatedOrders, products: updatedProducts });
         };
 
-        window.resetSalesStats = function () {
-            if (confirm('دڵنیای لە ڕیسێتکردنی کۆی فرۆشتن و قازانج؟ ئەمە ژمارەی فرۆشراو لە هەموو بەرهەمەکان سفر دەکاتەوە و داواکاریە تەواوبووەکان دەسڕێتەوە.')) {
-                db.products.forEach(p => { p.sold = 0; p.pending = 0; });
-                db.orders = db.orders.filter(o => o.status !== 'completed');
-                saveToFirebase();
-            }
-        };
-
-        window.deleteAllOrders = function () {
-            if (db.orders.length === 0) { alert('هیچ داواکاریەک نییە بۆ سڕینەوە.'); return; }
-            if (confirm('دڵنیای لە سڕینەوەی هەموو داواکاریەکان؟ ئەم کردارە گەرانەوەی نییە.')) {
-                db.orders = [];
-                db.nextOrderId = 1;
-                saveToFirebase();
-            }
-        };
-
-        loadFromFirebase();
+        lucide.createIcons();
     </script>
 </body>
-
 </html>
