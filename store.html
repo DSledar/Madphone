@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فرۆشگای مۆبایل</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap');
+        * { font-family: 'Noto Sans Arabic', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .store-container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 0; max-width: 1400px; margin: 0 auto; overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; position: relative; }
+        .nav-link-custom { position: absolute; top: 20px; left: 20px; }
+        .cart-badge { position: fixed; bottom: 30px; left: 30px; background: #ff6b6b; color: white; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; box-shadow: 0 5px 20px rgba(255, 107, 107, 0.5); transition: transform 0.3s; z-index: 1000; }
+        .cart-badge:hover { transform: scale(1.1); }
+        .cart-count { position: absolute; top: -5px; right: -5px; background: #fff; color: #ff6b6b; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold; }
+        .product-grid { padding: 30px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .product-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: all 0.3s; border: 2px solid #f0f0f0; cursor: pointer; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); border-color: #667eea; }
+        .product-image { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 250px; display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; position: relative; overflow: hidden; }
+        .product-image img { width: 100%; height: 100%; object-fit: contain; padding: 10px; background: white; }
+        .product-image i { position: absolute; }
+        .product-info { padding: 20px; }
+        .product-name { font-size: 1.3rem; font-weight: 700; color: #333; margin-bottom: 10px; }
+        .product-price { font-size: 1.8rem; color: #667eea; font-weight: bold; margin-bottom: 10px; }
+        .stock-info { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.9rem; }
+        .stock-available { color: #51cf66; font-weight: 600; }
+        .stock-low { color: #ff6b6b; font-weight: 600; }
+        .btn-add-cart { width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; transition: all 0.3s; }
+        .btn-add-cart:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        .btn-add-cart:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-custom { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 25px; border-radius: 10px; transition: all 0.3s; }
+        .btn-custom:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); color: white; }
+        .cart-item { background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .form-control { border-radius: 10px; border: 2px solid #e0e0e0; padding: 12px; margin-bottom: 15px; }
+        .form-control:focus { border-color: #667eea; box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25); }
+        .quantity-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .quantity-btn { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #667eea; background: white; color: #667eea; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .quantity-btn:hover { background: #667eea; color: white; }
+        .modal-content { border-radius: 20px; }
+        .product-detail-modal .modal-body { padding: 0; }
+        .product-detail-image { width: 100%; max-height: 400px; object-fit: contain; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; }
+        .product-detail-content { padding: 30px; }
+        .detail-price { font-size: 2.5rem; color: #667eea; font-weight: bold; margin: 20px 0; }
+        .detail-stock { font-size: 1.2rem; margin: 15px 0; }
+        .detail-description { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="cart-badge" data-bs-toggle="modal" data-bs-target="#cartModal">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </div>
+
+    <div class="store-container">
+        <div class="header">
+            <a href="https://dsledar.github.io/Madphone/" class="btn btn-light nav-link-custom"><i class="fas fa-user-shield"></i> بەڕێوەبەر</a>
+            <h1><i class="fas fa-mobile-alt"></i> فرۆشگای مۆبایل</h1>
+            <p class="mb-0">باشترین مۆبایلەکان بە نرخی گونجاو</p>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+    </div>
+
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title"><i class="fas fa-shopping-cart"></i> سەبەتە</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div id="cartItems"><p class="text-center text-muted">سەبەتە بەتاڵە</p></div>
+                    <hr>
+                    <div class="d-flex justify-content-between"><h4>کۆی گشتی:</h4><h4 class="text-primary" id="cartTotal">$0.00</h4></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">داخستن</button>
+                    <button type="button" class="btn btn-custom" onclick="showCheckout()" id="checkoutBtn" disabled>دەستبەجێ کڕین</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="checkoutModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">تەواوکردنی داواکاری</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6 class="mb-3">زانیاری کڕیار</h6>
+                        <form id="checkoutForm">
+                            <div class="mb-3"><label class="form-label">ناوی تەواو *</label><input type="text" class="form-control" id="customerName" required></div>
+                            <div class="mb-3"><label class="form-label">ژمارە تەلەفۆن *</label><input type="tel" class="form-control" id="customerPhone" required></div>
+                            <div class="mb-3"><label class="form-label">ناونیشانی تەواو *</label><textarea class="form-control" id="customerLocation" rows="3" required></textarea></div>
+                        </form>
+                    </div>
+                    <div><h6 class="mb-3">پوختەی داواکاری</h6><div id="orderSummary"></div></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">داخستن</button>
+                    <button type="button" class="btn btn-custom" onclick="submitOrder()">پشتڕاستکردنەوە</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body text-center py-5">
+                    <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    <h3 class="mt-3">داواکاریت سەرکەوتوو بوو!</h3>
+                    <p class="text-muted">زۆر سوپاس. ئێمە زووترین کاتدا پەیوەندیت پێوە دەکەین.</p>
+                    <button class="btn btn-custom mt-3" data-bs-dismiss="modal">باشە</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="productDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content product-detail-modal">
+                <div class="modal-header"><h5 class="modal-title" id="detailProductName"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div id="detailProductImage"></div>
+                    <div class="product-detail-content">
+                        <div class="detail-price" id="detailProductPrice"></div>
+                        <div class="detail-stock" id="detailProductStock"></div>
+                        <div class="detail-description" id="detailProductDescription"></div>
+                        <button class="btn-add-cart w-100" id="detailAddToCartBtn"><i class="fas fa-cart-plus"></i> زیادکردن بۆ سەبەتە</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+                    const firebaseConfig = {
+            apiKey: "AIzaSyAx6nZbWvHGkk0zRQdIVHbG2hmK29pWzAY",
+            authDomain: "madphone-1706c.firebaseapp.com",
+            databaseURL: "https://madphone-1706c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "madphone-1706c",
+            storageBucket: "madphone-1706c.firebasestorage.app",
+            messagingSenderId: "777789640049",
+            appId: "1:777789640049:web:71255405df7ffc32257ad0"
+            };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        let db = { products: [], orders: [], nextProductId: 1, nextOrderId: 1 };
+        let cart = [];
+
+        function loadFromFirebase() {
+            const dbRef = ref(database, '/');
+            onValue(dbRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    db = snapshot.val();
+                    loadProducts();
+                }
+            });
+        }
+
+        function saveToFirebase() {
+            set(ref(database, '/'), db);
+        }
+
+        function loadProducts() {
+            const grid = document.getElementById('productGrid');
+            if (db.products.length === 0) {
+                grid.innerHTML = '<p class="text-center text-muted col-12">هیچ بەرهەمێک نییە</p>';
+                return;
+            }
+            grid.innerHTML = db.products.map(product => {
+                const available = product.quantity - product.pending;
+                const isAvailable = available > 0;
+                const stockClass = available < 10 ? 'stock-low' : 'stock-available';
+                const imageDisplay = product.image ? `<img src="${product.image}" alt="${product.name}">` : '<i class="fas fa-mobile-alt"></i>';
+                return `<div class="product-card" onclick="showProductDetail(${product.id})"><div class="product-image">${imageDisplay}</div><div class="product-info"><div class="product-name">${product.name}</div><div class="product-price">$${product.price.toFixed(2)}</div><div class="stock-info"><span class="${stockClass}"><i class="fas fa-box"></i> ${available} دانە ماوە</span></div>${product.description ? `<p class="text-muted small">${product.description.substring(0, 50)}...</p>` : ''}<button class="btn-add-cart" onclick="event.stopPropagation(); addToCart(${product.id})" ${!isAvailable ? 'disabled' : ''}><i class="fas fa-cart-plus"></i> ${isAvailable ? 'زیادکردن بۆ سەبەتە' : 'تەواو بووە'}</button></div></div>`;
+            }).join('');
+        }
+
+        window.showProductDetail = function(productId) {
+            const product = db.products.find(p => p.id === productId);
+            if (!product) return;
+            const available = product.quantity - product.pending;
+            const isAvailable = available > 0;
+            const stockClass = available < 10 ? 'stock-low' : 'stock-available';
+            document.getElementById('detailProductName').textContent = product.name;
+            document.getElementById('detailProductPrice').textContent = '$' + product.price.toFixed(2);
+            document.getElementById('detailProductStock').innerHTML = `<span class="${stockClass}"><i class="fas fa-box"></i> ${available} دانە ماوە لە کۆگا</span>`;
+            document.getElementById('detailProductDescription').innerHTML = product.description ? `<h6><i class="fas fa-info-circle"></i> وەسفی بەرهەم</h6><p>${product.description}</p>` : '';
+            const imageContainer = document.getElementById('detailProductImage');
+            imageContainer.innerHTML = product.image ? `<img src="${product.image}" class="product-detail-image" alt="${product.name}">` : `<div class="product-detail-image d-flex align-items-center justify-content-center" style="min-height: 300px;"><i class="fas fa-mobile-alt" style="font-size: 8rem; color: white;"></i></div>`;
+            const addBtn = document.getElementById('detailAddToCartBtn');
+            addBtn.disabled = !isAvailable;
+            addBtn.innerHTML = isAvailable ? '<i class="fas fa-cart-plus"></i> زیادکردن بۆ سەبەتە' : '<i class="fas fa-times"></i> تەواو بووە';
+            addBtn.onclick = function() { if (isAvailable) { addToCart(productId); bootstrap.Modal.getInstance(document.getElementById('productDetailModal')).hide(); } };
+            new bootstrap.Modal(document.getElementById('productDetailModal')).show();
+        };
+
+        window.addToCart = function(productId) {
+            const product = db.products.find(p => p.id === productId);
+            if (!product) return;
+            const available = product.quantity - product.pending;
+            const cartItem = cart.find(item => item.productId === productId);
+            if (cartItem) {
+                if (cartItem.quantity < available) cartItem.quantity++;
+                else { alert('ببورە، بڕی زیاتر لەمە لە کۆگا نییە'); return; }
+            } else {
+                if (available > 0) cart.push({ productId: product.id, name: product.name, price: product.price, quantity: 1, maxQuantity: available });
+            }
+            updateCart();
+        };
+
+        window.removeFromCart = function(productId) {
+            cart = cart.filter(item => item.productId !== productId);
+            updateCart();
+        };
+
+        window.updateQuantity = function(productId, change) {
+            const item = cart.find(i => i.productId === productId);
+            if (item) {
+                const newQuantity = item.quantity + change;
+                if (newQuantity > 0 && newQuantity <= item.maxQuantity) { item.quantity = newQuantity; updateCart(); }
+                else if (newQuantity > item.maxQuantity) alert('ببورە، بڕی زیاتر لەمە لە کۆگا نییە');
+            }
+        };
+
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartCount = document.getElementById('cartCount');
+            const cartTotal = document.getElementById('cartTotal');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-center text-muted">سەبەتە بەتاڵە</p>';
+                cartCount.textContent = '0';
+                cartTotal.textContent = '$0.00';
+                checkoutBtn.disabled = true;
+                return;
+            }
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = itemCount;
+            cartTotal.textContent = '$' + total.toFixed(2);
+            checkoutBtn.disabled = false;
+            cartItems.innerHTML = cart.map(item => `<div class="cart-item"><div class="d-flex justify-content-between align-items-start mb-2"><strong>${item.name}</strong><button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.productId})"><i class="fas fa-trash"></i></button></div><div class="d-flex justify-content-between align-items-center"><span class="text-muted">$${item.price.toFixed(2)}</span><div class="quantity-control"><button class="quantity-btn" onclick="updateQuantity(${item.productId}, -1)">-</button><span><strong>${item.quantity}</strong></span><button class="quantity-btn" onclick="updateQuantity(${item.productId}, 1)">+</button></div></div><div class="text-end mt-2"><strong class="text-primary">$${(item.price * item.quantity).toFixed(2)}</strong></div></div>`).join('');
+        }
+
+        window.showCheckout = function() {
+            const summary = document.getElementById('orderSummary');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            summary.innerHTML = `${cart.map(item => `<div class="d-flex justify-content-between mb-2"><span>${item.name} × ${item.quantity}</span><strong>$${(item.price * item.quantity).toFixed(2)}</strong></div>`).join('')}<hr><div class="d-flex justify-content-between"><h5>کۆی گشتی:</h5><h5 class="text-primary">$${total.toFixed(2)}</h5></div>`;
+            bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+            new bootstrap.Modal(document.getElementById('checkoutModal')).show();
+        };
+
+        window.submitOrder = function() {
+            const name = document.getElementById('customerName').value;
+            const phone = document.getElementById('customerPhone').value;
+            const location = document.getElementById('customerLocation').value;
+            if (!name || !phone || !location) { alert('تکایە هەموو خانەکان پڕبکەرەوە'); return; }
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const order = { id: db.nextOrderId++, customerName: name, phone: phone, location: location, items: cart.map(item => ({ productId: item.productId, name: item.name, price: item.price, quantity: item.quantity })), total: total, status: 'pending', date: new Date().toISOString() };
+            cart.forEach(item => {
+                const product = db.products.find(p => p.id === item.productId);
+                if (product) { product.pending += item.quantity; product.quantity -= item.quantity; }
+            });
+            db.orders.push(order);
+            saveToFirebase();
+            cart = [];
+            updateCart();
+            bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
+            new bootstrap.Modal(document.getElementById('successModal')).show();
+            document.getElementById('checkoutForm').reset();
+        };
+
+        loadFromFirebase();
+    </script>
+</body>
+</html>
