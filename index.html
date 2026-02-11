@@ -1,49 +1,239 @@
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پانێڵی بەڕێوەبەر - کۆمپانیای مۆبایل</title>
+    <title>Mad Phone - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap');
-        * { font-family: 'Noto Sans Arabic', sans-serif; }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .dashboard-container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 30px; max-width: 1400px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
-        .stats-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: transform 0.3s; }
-        .stats-card:hover { transform: translateY(-5px); }
-        .stats-card i { font-size: 2.5rem; margin-bottom: 10px; }
-        .product-table { background: #f8f9fa; border-radius: 15px; padding: 20px; margin-top: 20px; }
-        .btn-custom { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 25px; border-radius: 10px; transition: all 0.3s; }
-        .btn-custom:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); color: white; }
-        .modal-content { border-radius: 20px; }
-        .form-control, .form-select { border-radius: 10px; border: 2px solid #e0e0e0; padding: 12px; }
-        .form-control:focus, .form-select:focus { border-color: #667eea; box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25); }
-        .table { border-radius: 10px; overflow: hidden; }
-        .table thead { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .badge-status { padding: 8px 15px; border-radius: 20px; font-weight: 600; }
-        .low-stock { background: #ff6b6b; color: white; }
-        .in-stock { background: #51cf66; color: white; }
-        .out-stock { background: #868e96; color: white; }
-        .nav-link-custom { position: fixed; top: 20px; left: 20px; z-index: 1000; }
-        .firebase-status { position: fixed; bottom: 20px; right: 20px; background: #51cf66; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; }
-        .order-card { background: white; border: 2px solid #e0e0e0; border-radius: 15px; padding: 20px; margin-bottom: 20px; transition: all 0.3s; }
-        .order-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #667eea; }
-        .order-header { display: flex; justify-content-between; align-items: center; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; margin-bottom: 15px; }
-        .order-items { background: #f8f9fa; border-radius: 10px; padding: 15px; margin: 15px 0; }
-        .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e0e0e0; }
-        .order-item-row:last-child { border-bottom: none; }
-        .order-item-name { font-weight: 600; color: #333; }
-        .order-item-quantity { color: #667eea; font-weight: 600; }
-        .order-total { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center; }
-        .customer-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
-        .info-item { background: #f8f9fa; padding: 10px 15px; border-radius: 8px; }
-        .info-label { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
-        .info-value { font-weight: 600; color: #333; }
+
+        * {
+            font-family: 'Noto Sans Arabic', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-card i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .product-table {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-custom:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 12px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .low-stock {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .in-stock {
+            background: #51cf66;
+            color: white;
+        }
+
+        .out-stock {
+            background: #868e96;
+            color: white;
+        }
+
+        .nav-link-custom {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .firebase-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #51cf66;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .order-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .order-header {
+            display: flex;
+           position:  justify-content-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 15px;
+        }
+
+        .order-items {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .order-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .order-item-quantity {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .order-total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .customer-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
     </style>
 </head>
+
 <body>
     <div class="firebase-status" id="firebaseStatus">
         <i class="fas fa-sync fa-spin"></i> چاوەڕوانی پەیوەندی...
@@ -55,15 +245,35 @@
 
     <div class="dashboard-container">
         <div class="header">
-            <h1><i class="fas fa-mobile-alt"></i> پانێڵی بەڕێوەبەری کۆمپانیای مۆبایل</h1>
-            <p class="mb-0">بەڕێوەبردنی کۆگا - بنکەی زانیاری هاوبەش</p>
+            <h1><i class="fas fa-mobile-alt"></i> MadPhone</h1>
+            <p class="mb-0">بەڕێوەبردنی کۆگا - Addmin</p>
         </div>
 
         <div class="row">
-            <div class="col-md-3"><div class="stats-card text-center"><i class="fas fa-boxes"></i><h3 id="totalProducts">0</h3><p class="mb-0">کۆی بەرهەمەکان</p></div></div>
-            <div class="col-md-3"><div class="stats-card text-center"><i class="fas fa-shopping-cart"></i><h3 id="totalOrders">0</h3><p class="mb-0">داواکاریەکان</p></div></div>
-            <div class="col-md-3"><div class="stats-card text-center"><i class="fas fa-clock"></i><h3 id="pendingOrders">0</h3><p class="mb-0">داواکاری چاوەڕوان</p></div></div>
-            <div class="col-md-3"><div class="stats-card text-center"><i class="fas fa-dollar-sign"></i><h3 id="totalRevenue">$0</h3><p class="mb-0">کۆی داهات</p></div></div>
+            <div class="col-md-3">
+                <div class="stats-card text-center"><i class="fas fa-boxes"></i>
+                    <h3 id="totalProducts">0</h3>
+                    <p class="mb-0">کۆی بەرهەمەکان</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center"><i class="fas fa-shopping-cart"></i>
+                    <h3 id="totalOrders">0</h3>
+                    <p class="mb-0">داواکاریەکان</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center"><i class="fas fa-clock"></i>
+                    <h3 id="pendingOrders">0</h3>
+                    <p class="mb-0">داواکاری چاوەڕوان</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center"><i class="fas fa-dollar-sign"></i>
+                    <h3 id="totalRevenue">$0</h3>
+                    <p class="mb-0">کۆی داهات</p>
+                </div>
+            </div>
         </div>
 
         <div class="mt-4">
@@ -76,7 +286,17 @@
             <h3 class="mb-4"><i class="fas fa-list"></i> لیستی بەرهەمەکان</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
-                    <thead><tr><th>ناوی بەرهەم</th><th>نرخ</th><th>بڕی ماوە</th><th>فرۆشراو</th><th>چاوەڕوان</th><th>دۆخ</th><th>کردارەکان</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>ناوی بەرهەم</th>
+                            <th>نرخ</th>
+                            <th>بڕی ماوە</th>
+                            <th>فرۆشراو</th>
+                            <th>چاوەڕوان</th>
+                            <th>دۆخ</th>
+                            <th>کردارەکان</th>
+                        </tr>
+                    </thead>
                     <tbody id="productTableBody"></tbody>
                 </table>
             </div>
@@ -91,14 +311,23 @@
     <div class="modal fade" id="addProductModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title">زیادکردنی بەرهەمی نوێ</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header">
+                    <h5 class="modal-title">زیادکردنی بەرهەمی نوێ</h5><button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <form id="addProductForm">
-                        <div class="mb-3"><label class="form-label">ناوی بەرهەم</label><input type="text" class="form-control" id="productName" required></div>
-                        <div class="mb-3"><label class="form-label">نرخ ($)</label><input type="number" class="form-control" id="productPrice" step="0.01" required></div>
-                        <div class="mb-3"><label class="form-label">بڕ</label><input type="number" class="form-control" id="productQuantity" required></div>
-                        <div class="mb-3"><label class="form-label">وەسف</label><textarea class="form-control" id="productDescription" rows="3"></textarea></div>
-                        <div class="mb-3"><label class="form-label">وێنەی بەرهەم</label><input type="file" class="form-control" id="productImage" accept="image/*"><small class="text-muted">کەمتر لە 500KB</small></div>
+                        <div class="mb-3"><label class="form-label">ناوی بەرهەم</label><input type="text"
+                                class="form-control" id="productName" required></div>
+                        <div class="mb-3"><label class="form-label">نرخ ($)</label><input type="number"
+                                class="form-control" id="productPrice" step="0.01" required></div>
+                        <div class="mb-3"><label class="form-label">بڕ</label><input type="number" class="form-control"
+                                id="productQuantity" required></div>
+                        <div class="mb-3"><label class="form-label">وەسف</label><textarea class="form-control"
+                                id="productDescription" rows="3"></textarea></div>
+                        <div class="mb-3"><label class="form-label">وێنەی بەرهەم</label><input type="file"
+                                class="form-control" id="productImage" accept="image/*"><small class="text-muted">کەمتر
+                                لە 500KB</small></div>
                         <div id="imagePreview" class="mt-2"></div>
                     </form>
                 </div>
@@ -113,15 +342,23 @@
     <div class="modal fade" id="editProductModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title">دەستکاریکردنی بەرهەم</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header">
+                    <h5 class="modal-title">دەستکاریکردنی بەرهەم</h5><button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <form id="editProductForm">
                         <input type="hidden" id="editProductId">
-                        <div class="mb-3"><label class="form-label">ناوی بەرهەم</label><input type="text" class="form-control" id="editProductName" required></div>
-                        <div class="mb-3"><label class="form-label">نرخ ($)</label><input type="number" class="form-control" id="editProductPrice" step="0.01" required></div>
-                        <div class="mb-3"><label class="form-label">بڕ</label><input type="number" class="form-control" id="editProductQuantity" required></div>
-                        <div class="mb-3"><label class="form-label">وەسف</label><textarea class="form-control" id="editProductDescription" rows="3"></textarea></div>
-                        <div class="mb-3"><label class="form-label">وێنەی نوێ</label><input type="file" class="form-control" id="editProductImage" accept="image/*"></div>
+                        <div class="mb-3"><label class="form-label">ناوی بەرهەم</label><input type="text"
+                                class="form-control" id="editProductName" required></div>
+                        <div class="mb-3"><label class="form-label">نرخ ($)</label><input type="number"
+                                class="form-control" id="editProductPrice" step="0.01" required></div>
+                        <div class="mb-3"><label class="form-label">بڕ</label><input type="number" class="form-control"
+                                id="editProductQuantity" required></div>
+                        <div class="mb-3"><label class="form-label">وەسف</label><textarea class="form-control"
+                                id="editProductDescription" rows="3"></textarea></div>
+                        <div class="mb-3"><label class="form-label">وێنەی نوێ</label><input type="file"
+                                class="form-control" id="editProductImage" accept="image/*"></div>
                         <div id="editImagePreview" class="mt-2"></div>
                     </form>
                 </div>
@@ -138,14 +375,14 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-                        const firebaseConfig = {
-        apiKey: "AIzaSyAx6nZbWvHGkk0zRQdIVHbG2hmK29pWzAY",
-        authDomain: "madphone-1706c.firebaseapp.com",
-        databaseURL: "https://madphone-1706c-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "madphone-1706c",
-        storageBucket: "madphone-1706c.firebasestorage.app",
-        messagingSenderId: "777789640049",
-        appId: "1:777789640049:web:71255405df7ffc32257ad0"
+        const firebaseConfig = {
+            apiKey: "AIzaSyAx6nZbWvHGkk0zRQdIVHbG2hmK29pWzAY",
+            authDomain: "madphone-1706c.firebaseapp.com",
+            databaseURL: "https://madphone-1706c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "madphone-1706c",
+            storageBucket: "madphone-1706c.firebasestorage.app",
+            messagingSenderId: "777789640049",
+            appId: "1:777789640049:web:71255405df7ffc32257ad0"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -183,7 +420,7 @@
             set(ref(database, '/'), db);
         }
 
-        document.getElementById('productImage').addEventListener('change', function(e) {
+        document.getElementById('productImage').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file && file.size > 500000) {
                 alert('وێنەکە زۆر گەورەیە! کەمتر لە 500KB');
@@ -197,7 +434,7 @@
             }
         });
 
-        document.getElementById('editProductImage').addEventListener('change', function(e) {
+        document.getElementById('editProductImage').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file && file.size > 500000) {
                 alert('وێنەکە زۆر گەورەیە! کەمتر لە 500KB');
@@ -211,7 +448,7 @@
             }
         });
 
-        window.addProduct = function() {
+        window.addProduct = function () {
             const name = document.getElementById('productName').value;
             const price = parseFloat(document.getElementById('productPrice').value);
             const quantity = parseInt(document.getElementById('productQuantity').value);
@@ -220,7 +457,7 @@
 
             if (imageFile) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     db.products.push({ id: db.nextProductId++, name, price, quantity, sold: 0, pending: 0, description, image: e.target.result });
                     saveToFirebase();
                     bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
@@ -236,7 +473,7 @@
             }
         };
 
-        window.editProduct = function(id) {
+        window.editProduct = function (id) {
             const product = db.products.find(p => p.id === id);
             if (product) {
                 document.getElementById('editProductId').value = product.id;
@@ -249,7 +486,7 @@
             }
         };
 
-        window.updateProduct = function() {
+        window.updateProduct = function () {
             const id = parseInt(document.getElementById('editProductId').value);
             const product = db.products.find(p => p.id === id);
             if (product) {
@@ -260,7 +497,7 @@
                 const imageFile = document.getElementById('editProductImage').files[0];
                 if (imageFile) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         product.image = e.target.result;
                         saveToFirebase();
                         bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
@@ -273,14 +510,14 @@
             }
         };
 
-        window.deleteProduct = function(id) {
+        window.deleteProduct = function (id) {
             if (confirm('دڵنیای لە سڕینەوە؟')) {
                 db.products = db.products.filter(p => p.id !== id);
                 saveToFirebase();
             }
         };
 
-        window.updateOrderStatus = function(orderId, status) {
+        window.updateOrderStatus = function (orderId, status) {
             const order = db.orders.find(o => o.id === orderId);
             if (order) {
                 const oldStatus = order.status;
@@ -333,4 +570,5 @@
         loadFromFirebase();
     </script>
 </body>
+
 </html>
