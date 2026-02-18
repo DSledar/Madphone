@@ -10,9 +10,24 @@
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* ── Mobile viewport fix for login overlay ── */
+        html, body {
+            height: 100%;
+        }
         body {
             font-family: 'Noto Sans Arabic', sans-serif;
             background-color: #f9fafb;
+        }
+        body.login-active {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        #loginOverlay {
+            /* Extra insurance for iOS Safari */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         .modal {
@@ -42,8 +57,8 @@
          LOGIN SCREEN OVERLAY
          Shows before the dashboard. Hidden after successful Firebase login.
     ═══════════════════════════════════════════════════════════════════ -->
-    <div id="loginOverlay" class="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-gray-900">
-        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-10 mx-4 space-y-6">
+    <div id="loginOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;min-height:-webkit-fill-available;z-index:99999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4c1d95,#312e81,#111827);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div style="background:white;border-radius:24px;width:calc(100% - 32px);max-width:440px;box-shadow:0 25px 60px rgba(0,0,0,0.4);padding:40px 32px;margin:auto;" class="space-y-6">
             <!-- Logo -->
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto">
@@ -301,9 +316,20 @@
         // ── Auth state watcher: hide/show overlay ──────────────────────────
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                loginOverlay.style.display = 'none';   // logged in → hide overlay
+                loginOverlay.style.display = 'none';
+                document.body.classList.remove('login-active');
             } else {
-                loginOverlay.style.display = 'flex';   // logged out → show overlay
+                loginOverlay.style.display = 'flex';
+                document.body.classList.add('login-active');
+                // Force overlay to cover full viewport on mobile
+                loginOverlay.style.height = window.innerHeight + 'px';
+            }
+        });
+
+        // Re-measure on resize/orientation change (mobile keyboard, rotation)
+        window.addEventListener('resize', () => {
+            if (loginOverlay.style.display !== 'none') {
+                loginOverlay.style.height = window.innerHeight + 'px';
             }
         });
 
