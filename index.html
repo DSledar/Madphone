@@ -1,249 +1,46 @@
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Madphone - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Noto Sans Arabic', sans-serif; background-color: #f9fafb; }
-        .modal { display: none; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
-        .modal.active { display: flex; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
-
-        /* ═══════════════════════════════════════════════════════════════════
-           LOGIN PROTECTION STYLES (won't interfere with your existing styles)
-           ═══════════════════════════════════════════════════════════════════ */
-        #login-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: #0a0a0f;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        #login-screen.hidden { display: none; }
-        
-        #admin-content { display: none; }
-        #admin-content.visible { display: block; }
-
-        /* Animated background grid */
-        #login-screen::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(139,92,246,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(139,92,246,0.03) 1px, transparent 1px);
-            background-size: 48px 48px;
-            animation: gridFloat 20s linear infinite;
-        }
-        @keyframes gridFloat {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(48px); }
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background-color: #f9fafb;
         }
 
-        /* Glow orb */
-        #login-screen::after {
-            content: '';
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-        }
-
-        .login-card {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            animation: fadeIn 0.6s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .login-inner {
-            background: #12121a;
-            border: 1px solid #1e1e2e;
-            border-radius: 20px;
-            padding: 44px 40px 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        .login-inner::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
-        }
-
-        .login-lock-icon {
-            width: 52px;
-            height: 52px;
-            background: rgba(139,92,246,0.12);
-            border: 1px solid rgba(139,92,246,0.2);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 28px;
-            font-size: 22px;
-        }
-
-        .login-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 6px;
-            color: #f0f0f0;
-        }
-
-        .login-subtitle {
-            color: #5a5a7a;
-            font-size: 13px;
-            font-family: 'DM Mono', monospace;
-            margin-bottom: 36px;
-        }
-
-        .login-field {
-            margin-bottom: 18px;
-        }
-
-        .login-label {
-            display: block;
-            font-size: 11px;
-            font-family: 'DM Mono', monospace;
-            color: #5a5a7a;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .login-input {
-            width: 100%;
-            background: #0a0a0f;
-            border: 1px solid #1e1e2e;
-            border-radius: 10px;
-            padding: 13px 16px;
-            font-size: 15px;
-            font-family: 'DM Mono', monospace;
-            color: #f0f0f0;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .login-input:focus {
-            border-color: rgba(139,92,246,0.4);
-            box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
-        }
-
-        .login-input.error {
-            border-color: #ff4d6d;
-            box-shadow: 0 0 0 3px rgba(255,77,109,0.1);
-            animation: shake 0.35s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-        }
-
-        .login-error-msg {
-            color: #ff4d6d;
-            font-size: 12px;
-            font-family: 'DM Mono', monospace;
-            margin-top: 8px;
+        .modal {
             display: none;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
         }
-        .login-error-msg.visible { display: block; }
 
-        .login-btn {
-            width: 100%;
-            padding: 14px;
+        .modal.active {
+            display: flex;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
             background: #8b5cf6;
-            color: #ffffff;
-            border: none;
             border-radius: 10px;
-            font-family: 'Syne', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 10px;
-            letter-spacing: 0.3px;
-            transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 24px rgba(139,92,246,0.3);
-        }
-
-        .login-btn:active { transform: translateY(0); }
-
-        .login-btn.loading {
-            opacity: 0.7;
-            pointer-events: none;
         }
     </style>
 </head>
+
 <body class="text-gray-900">
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         LOGIN SCREEN (Shows first)
-         ═══════════════════════════════════════════════════════════════════ -->
-    <div id="login-screen">
-        <div class="login-card">
-            <div class="login-inner">
-                <div class="login-lock-icon">🔐</div>
-                <h1 class="login-title">Admin Access</h1>
-                <p class="login-subtitle">// Madphone Dashboard — Authentication Required</p>
-
-                <div class="login-field">
-                    <label class="login-label">Username</label>
-                    <input type="text" id="login-username" class="login-input" placeholder="Enter username" autocomplete="off" spellcheck="false"/>
-                </div>
-
-                <div class="login-field">
-                    <label class="login-label">Password</label>
-                    <input type="password" id="login-password" class="login-input" placeholder="Enter password"/>
-                    <p class="login-error-msg" id="login-error-msg">⚠ Incorrect username or password.</p>
-                </div>
-
-                <button id="login-submit-btn" class="login-btn" onclick="handleLogin()">Sign In →</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════════════════════════════
-         YOUR ORIGINAL ADMIN DASHBOARD (Hidden until login)
-         ═══════════════════════════════════════════════════════════════════ -->
-    <div id="admin-content">
-
     <!-- Firebase Status Badge -->
-    <div id="firebaseStatus" class="fixed bottom-6 left-6 z-50 bg-amber-400 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+    <div id="firebaseStatus"
+        class="fixed bottom-6 left-6 z-50 bg-amber-400 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
         <i data-lucide="loader" class="w-4 h-4 animate-spin"></i> چاوەڕوانی پەیوەندی...
     </div>
 
@@ -255,8 +52,10 @@
                 <h1 class="text-2xl font-bold text-purple-900">Madphone Admin</h1>
             </div>
             <div class="flex items-center gap-3">
-                <span class="bg-purple-50 text-purple-600 px-4 py-1 rounded-full text-sm font-bold border border-purple-100">سەرپەرشتیار</span>
-                <a href="https://dsledar.github.io/Madphone/store.html" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                <span
+                    class="bg-purple-50 text-purple-600 px-4 py-1 rounded-full text-sm font-bold border border-purple-100">سەرپەرشتیار</span>
+                <a href="https://dsledar.github.io/Madphone/store.html"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2">
                     <i data-lucide="store" class="w-4 h-4"></i> فرۆشگا
                 </a>
             </div>
@@ -268,20 +67,35 @@
         <!-- Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
-                <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600"><i data-lucide="package" class="w-6 h-6"></i></div>
-                <div><p class="text-gray-400 text-sm">بەرهەم</p><h4 id="statProducts" class="text-2xl font-bold">0</h4></div>
+                <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600"><i data-lucide="package" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm">بەرهەم</p>
+                    <h4 id="statProducts" class="text-2xl font-bold">0</h4>
+                </div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
-                <div class="p-3 rounded-xl bg-blue-50 text-blue-600"><i data-lucide="shopping-cart" class="w-6 h-6"></i></div>
-                <div><p class="text-gray-400 text-sm">داواکاری</p><h4 id="statOrders" class="text-2xl font-bold">0</h4></div>
+                <div class="p-3 rounded-xl bg-blue-50 text-blue-600"><i data-lucide="shopping-cart" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm">داواکاری</p>
+                    <h4 id="statOrders" class="text-2xl font-bold">0</h4>
+                </div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
                 <div class="p-3 rounded-xl bg-amber-50 text-amber-600"><i data-lucide="clock" class="w-6 h-6"></i></div>
-                <div><p class="text-gray-400 text-sm">چاوەڕوان</p><h4 id="statPending" class="text-2xl font-bold">0</h4></div>
+                <div>
+                    <p class="text-gray-400 text-sm">چاوەڕوان</p>
+                    <h4 id="statPending" class="text-2xl font-bold">0</h4>
+                </div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-4">
-                <div class="p-3 rounded-xl bg-emerald-50 text-emerald-600"><i data-lucide="dollar-sign" class="w-6 h-6"></i></div>
-                <div><p class="text-gray-400 text-sm">داهات</p><h4 id="statRevenue" class="text-2xl font-bold">$0</h4></div>
+                <div class="p-3 rounded-xl bg-emerald-50 text-emerald-600"><i data-lucide="dollar-sign"
+                        class="w-6 h-6"></i></div>
+                <div>
+                    <p class="text-gray-400 text-sm">داهات</p>
+                    <h4 id="statRevenue" class="text-2xl font-bold">$0</h4>
+                </div>
             </div>
         </div>
 
@@ -292,10 +106,12 @@
                     <i data-lucide="package" class="text-purple-600 w-5 h-5"></i> لیستەی بەرهەمەکان
                 </h3>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="openResetModal()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-amber-600 transition-colors flex items-center gap-2 shadow-md shadow-amber-100">
+                    <button onclick="openResetModal()"
+                        class="bg-amber-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-amber-600 transition-colors flex items-center gap-2 shadow-md shadow-amber-100">
                         <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ڕیسێتکردنی فرۆشتن و قازانج
                     </button>
-                    <button onclick="openProductModal()" class="bg-purple-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-lg shadow-purple-100">
+                    <button onclick="openProductModal()"
+                        class="bg-purple-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-lg shadow-purple-100">
                         <i data-lucide="plus" class="w-4 h-4"></i> زیادکردنی بەرهەم
                     </button>
                 </div>
@@ -323,7 +139,8 @@
                 <h3 class="text-xl font-bold flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="text-blue-600 w-5 h-5"></i> داواکارییەکان
                 </h3>
-                <button onclick="deleteAllOrders()" class="bg-red-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors flex items-center gap-2 shadow-md shadow-red-100">
+                <button onclick="deleteAllOrders()"
+                    class="bg-red-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors flex items-center gap-2 shadow-md shadow-red-100">
                     <i data-lucide="trash-2" class="w-4 h-4"></i> سڕینەوەی هەموو داواکارییەکان
                 </button>
             </div>
@@ -336,15 +153,23 @@
     <div id="productModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl p-8 space-y-4">
             <h3 id="modalTitle" class="text-2xl font-bold">زیادکردنی بەرهەم</h3>
-            <input id="prodName" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400" placeholder="ناوی بەرهەم">
+            <input id="prodName" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400"
+                placeholder="ناوی بەرهەم">
             <div class="grid grid-cols-2 gap-4">
-                <input id="prodPrice" type="number" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400" placeholder="نرخ $">
-                <input id="prodQty" type="number" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400" placeholder="بڕی کۆگا">
+                <input id="prodPrice" type="number"
+                    class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400" placeholder="نرخ $">
+                <input id="prodQty" type="number"
+                    class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400"
+                    placeholder="بڕی کۆگا">
             </div>
-            <textarea id="prodDesc" class="w-full p-3 border rounded-xl h-24 focus:outline-none focus:border-purple-400" placeholder="وەسفی کورت"></textarea>
-            <input id="prodImg" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400" placeholder="لینکی وێنە (URL)">
-            <button onclick="saveProduct()" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-purple-700 transition-colors">پاشەکەوتکردن</button>
-            <button onclick="closeProductModal()" class="w-full text-gray-400 font-semibold hover:text-gray-600 transition-colors">داخستن</button>
+            <textarea id="prodDesc" class="w-full p-3 border rounded-xl h-24 focus:outline-none focus:border-purple-400"
+                placeholder="وەسفی کورت"></textarea>
+            <input id="prodImg" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400"
+                placeholder="لینکی وێنە (URL)">
+            <button onclick="saveProduct()"
+                class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-purple-700 transition-colors">پاشەکەوتکردن</button>
+            <button onclick="closeProductModal()"
+                class="w-full text-gray-400 font-semibold hover:text-gray-600 transition-colors">داخستن</button>
         </div>
     </div>
 
@@ -354,145 +179,168 @@
             <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-500">
                 <i data-lucide="alert-triangle" class="w-8 h-8"></i>
             </div>
-            <h3 class="text-xl font-bold">ئاگاداری</h3>
-            <p class="text-gray-500">ئایا دڵنیای لە ڕیسێتکردنی فرۆشتن و قازانجەکان؟ ئەم کردارە گەرانەوەی نییە.</p>
+            <h3 class="text-xl font-bold">ڕیسێتکردن دڵنیاکەرەوە؟</h3>
+            <p class="text-gray-500 text-sm">ئەمە ژمارەی فرۆشراو و داهاتی کۆتای سفر دەکاتەوە و داواکارییە تەواوبووەکان
+                دەسڕێتەوە.</p>
             <div class="flex gap-3">
-                <button onclick="confirmReset()" class="flex-1 bg-amber-500 text-white py-3 rounded-xl font-bold hover:bg-amber-600">دڵنیام، ڕیسێت بکە</button>
-                <button onclick="closeResetModal()" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200">هەڵوەشاندن</button>
+                <button onclick="confirmReset()"
+                    class="flex-1 bg-amber-500 text-white py-3 rounded-xl font-bold hover:bg-amber-600 transition-colors">بەڵێ،
+                    ڕیسێتبکە</button>
+                <button onclick="toggleModal('resetModal', false)"
+                    class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors">نەخێر</button>
             </div>
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         YOUR ORIGINAL FIREBASE SCRIPT (Unchanged)
-         ═══════════════════════════════════════════════════════════════════ -->
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
-        import { getDatabase, ref, onValue, set } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCeXNOJM9Nif93_w4CATcGrh2bgFhk3H18",
-            authDomain: "madphone-5d3c2.firebaseapp.com",
-            databaseURL: "https://madphone-5d3c2-default-rtdb.firebaseio.com",
-            projectId: "madphone-5d3c2",
-            storageBucket: "madphone-5d3c2.firebasestorage.app",
-            messagingSenderId: "776836449746",
-            appId: "1:776836449746:web:f13e54df58cdac56e9ff14"
+            apiKey: "AIzaSyAx6nZbWvHGkk0zRQdIVHbG2hmK29pWzAY",
+            authDomain: "madphone-1706c.firebaseapp.com",
+            databaseURL: "https://madphone-1706c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "madphone-1706c",
+            storageBucket: "madphone-1706c.firebasestorage.app",
+            messagingSenderId: "777789640049",
+            appId: "1:777789640049:web:71255405df7ffc32257ad0"
         };
 
         const app = initializeApp(firebaseConfig);
-        const db  = getDatabase(app);
-        const dbRef = ref(db, 'store');
-        let storeData = { products: [], orders: [], nextProductId: 1, nextOrderId: 1 };
+        const database = getDatabase(app);
+        const dbRef = ref(database, '/');
+
+        let storeData = { products: [], orders: [], nextOrderId: 1, nextProductId: 1 };
         let editingId = null;
 
-        onValue(dbRef, (snapshot) => {
-            const val = snapshot.val();
-            if (val) storeData = val;
-            else set(dbRef, storeData);
-            renderProducts();
-            renderOrders();
-            updateStats();
-            updateFirebaseStatus('connected');
-        }, (error) => {
-            console.error('Firebase error:', error);
-            updateFirebaseStatus('error');
-        });
-
-        // ─── Update Firebase status badge ─────────────────────────────────
-        function updateFirebaseStatus(status) {
-            const badge = document.getElementById('firebaseStatus');
-            if (status === 'connected') {
-                badge.className = 'fixed bottom-6 left-6 z-50 bg-emerald-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
-                badge.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> پەیوەست بوو بە Firebase';
-            } else if (status === 'error') {
-                badge.className = 'fixed bottom-6 left-6 z-50 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
-                badge.innerHTML = '<i data-lucide="x-circle" class="w-4 h-4"></i> هەڵەی پەیوەندی';
-            }
-            lucide.createIcons();
-        }
-
-        // ─── Helper functions ──────────────────────────────────────────────
-        function toArray(obj) { return Array.isArray(obj) ? obj : Object.values(obj || {}); }
-        function toggleModal(id, show) {
-            const el = document.getElementById(id);
-            if (show) { el.classList.add('active'); } else { el.classList.remove('active'); }
-        }
+        // ─── Modal helpers ────────────────────────────────────────────────
+        window.toggleModal = (id, show) => {
+            document.getElementById(id).classList.toggle('active', show);
+        };
         window.openProductModal = () => {
             editingId = null;
             document.getElementById('modalTitle').textContent = 'زیادکردنی بەرهەم';
-            ['prodName','prodPrice','prodQty','prodDesc','prodImg'].forEach(id => document.getElementById(id).value = '');
+            ['prodName', 'prodDesc', 'prodImg'].forEach(id => document.getElementById(id).value = '');
+            ['prodPrice', 'prodQty'].forEach(id => document.getElementById(id).value = '');
             toggleModal('productModal', true);
         };
         window.closeProductModal = () => toggleModal('productModal', false);
         window.openResetModal = () => toggleModal('resetModal', true);
-        window.closeResetModal = () => toggleModal('resetModal', false);
 
-        // ─── Update stats ──────────────────────────────────────────────────
-        function updateStats() {
-            const products = toArray(storeData.products);
-            const orders   = toArray(storeData.orders);
-            document.getElementById('statProducts').textContent = products.length;
-            document.getElementById('statOrders').textContent   = orders.length;
-            document.getElementById('statPending').textContent  = orders.filter(o => o.status === 'pending').length;
-            const revenue = orders.filter(o => o.status === 'completed').reduce((s, o) => s + (parseFloat(o.total)||0), 0);
-            document.getElementById('statRevenue').textContent = '$' + revenue.toFixed(2);
+        // ─── Firebase realtime listener ───────────────────────────────────
+        onValue(dbRef, (snapshot) => {
+            const statusEl = document.getElementById('firebaseStatus');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                storeData = {
+                    products: data.products
+                        ? (Array.isArray(data.products) ? data.products : Object.values(data.products))
+                        : [],
+                    orders: data.orders
+                        ? (Array.isArray(data.orders) ? data.orders : Object.values(data.orders))
+                        : [],
+                    nextOrderId: data.nextOrderId || 1,
+                    nextProductId: data.nextProductId || 1
+                };
+                statusEl.innerHTML = '<i data-lucide="wifi" class="w-4 h-4"></i> پەیوەستە بە Firebase';
+                statusEl.className = 'fixed bottom-6 left-6 z-50 bg-emerald-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
+                updateDashboard();
+                lucide.createIcons();
+            } else {
+                statusEl.innerHTML = '<i data-lucide="wifi-off" class="w-4 h-4"></i> هیچ داتایەک نییە';
+                statusEl.className = 'fixed bottom-6 left-6 z-50 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
+                lucide.createIcons();
+            }
+        }, () => {
+            const statusEl = document.getElementById('firebaseStatus');
+            statusEl.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> هەڵەی پەیوەندی';
+            statusEl.className = 'fixed bottom-6 left-6 z-50 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2';
+            lucide.createIcons();
+        });
+
+        // ─── Dashboard update ──────────────────────────────────────────────
+        function updateDashboard() {
+            document.getElementById('statProducts').textContent = storeData.products.length;
+            document.getElementById('statOrders').textContent = storeData.orders.length;
+            document.getElementById('statPending').textContent = storeData.orders.filter(o => o.status === 'pending').length;
+            const rev = storeData.orders.filter(o => o.status === 'completed').reduce((s, o) => s + o.total, 0);
+            document.getElementById('statRevenue').textContent = `$${rev.toFixed(2)}`;
+            renderProducts();
+            renderOrders();
         }
 
         // ─── Render products table ─────────────────────────────────────────
         function renderProducts() {
             const tbody = document.getElementById('productTableBody');
-            tbody.innerHTML = toArray(storeData.products).map(p => {
-                const imgUrl = p.image || 'https://via.placeholder.com/60';
+            if (storeData.products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">هیچ بەرهەمێک نەدۆزرایەوە</td></tr>';
+                return;
+            }
+            tbody.innerHTML = storeData.products.map(p => {
+                const available = (p.quantity || 0) - (p.pending || 0);
+                const stockColor = available === 0 ? 'text-red-500' : (available < 5 ? 'text-amber-500' : 'text-gray-700');
                 return `
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="p-4 flex items-center gap-4">
-                        <img src="${imgUrl}" class="w-14 h-14 rounded-lg object-cover border"/>
-                        <div><p class="font-bold">${p.name}</p><p class="text-xs text-gray-400">${p.description || ''}</p></div>
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            ${p.image
+                        ? `<img src="${p.image}" class="w-10 h-10 rounded-lg object-cover border" onerror="this.style.display='none'">`
+                        : `<div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-300"><i data-lucide="smartphone" class="w-5 h-5"></i></div>`
+                    }
+                            <span class="font-bold">${p.name}</span>
+                        </div>
                     </td>
-                    <td class="p-4 font-bold text-indigo-600">$${parseFloat(p.price).toFixed(2)}</td>
-                    <td class="p-4"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-bold">${p.quantity || 0}</span></td>
-                    <td class="p-4"><span class="bg-green-50 text-green-600 px-3 py-1 rounded-full text-sm font-bold">${p.sold || 0}</span></td>
-                    <td class="p-4"><span class="bg-amber-50 text-amber-600 px-3 py-1 rounded-full text-sm font-bold">${p.pending || 0}</span></td>
-                    <td class="p-4 flex gap-2">
-                        <button onclick="editProduct(${p.id})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition-colors">
-                            <i data-lucide="edit-2" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="deleteProduct(${p.id})" class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition-colors">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
+                    <td class="p-4 text-purple-600 font-bold">$${parseFloat(p.price).toFixed(2)}</td>
+                    <td class="p-4 font-semibold ${stockColor}">${available}</td>
+                    <td class="p-4 text-green-600 font-bold">${p.sold || 0}</td>
+                    <td class="p-4 text-amber-600 font-bold">${p.pending || 0}</td>
+                    <td class="p-4">
+                        <div class="flex gap-2">
+                            <button onclick="editProduct(${p.id})" class="text-blue-500 p-2 hover:bg-blue-50 rounded-lg transition-colors"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                            <button onclick="deleteProduct(${p.id})" class="text-red-500 p-2 hover:bg-red-50 rounded-lg transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
                     </td>
                 </tr>`;
             }).join('');
             lucide.createIcons();
         }
 
-        // ─── Render orders ─────────────────────────────────────────────────
+        // ─── Render orders grid ────────────────────────────────────────────
+        // Firebase stores arrays as objects with numeric keys — always normalize
+        function toArray(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            return Object.values(val);
+        }
+
         function renderOrders() {
             const grid = document.getElementById('ordersGrid');
-            const orders = toArray(storeData.orders);
-            if (orders.length === 0) {
-                grid.innerHTML = '<p class="text-gray-400 text-center py-8 col-span-full">هیچ داواکارییەک نییە</p>';
+            if (storeData.orders.length === 0) {
+                grid.innerHTML = '<div class="col-span-2 text-center py-12 text-gray-400 bg-white rounded-2xl border"><i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p>هیچ داواکارییەک نییە</p></div>';
+                lucide.createIcons();
                 return;
             }
-            grid.innerHTML = orders.map(order => {
+            const statusStyles = {
+                pending: { badge: 'bg-amber-100 text-amber-700', card: 'border-amber-200' },
+                completed: { badge: 'bg-green-100 text-green-700', card: 'border-green-200' },
+                cancelled: { badge: 'bg-red-100 text-red-700', card: 'border-gray-100' }
+            };
+            const statusLabels = { pending: 'چاوەڕوان', completed: 'تەواوبوو', cancelled: 'هەڵوەشاوە' };
+
+            grid.innerHTML = storeData.orders.slice().reverse().map(order => {
+                const s = statusStyles[order.status] || statusStyles.pending;
+                // CRITICAL FIX: Firebase stores nested arrays as objects — normalize here
                 const items = toArray(order.items);
-                const statusClass = order.status === 'pending' ? 'bg-amber-50 text-amber-600' : order.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600';
-                const statusText  = order.status === 'pending' ? 'چاوەڕوان' : order.status === 'completed' ? 'تەواو بووە' : 'هەڵوەشێنراوە';
-                const date = order.date ? new Date(order.date).toLocaleDateString('en-GB') : '';
                 return `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="bg-white p-6 rounded-2xl border-2 ${s.card} shadow-sm space-y-4">
                     <div class="flex justify-between items-start">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs text-gray-400">#{order.id}</span>
-                                <span class="${statusClass} px-3 py-1 rounded-full text-xs font-bold">${statusText}</span>
-                            </div>
-                            <p class="font-bold text-lg">${order.customer?.name || 'کڕیار'}</p>
-                            <p class="text-xs text-gray-400">${order.customer?.phone || ''}</p>
+                            <h4 class="font-bold text-lg">#${order.id} - ${order.customerName || ''}</h4>
+                            <p class="text-sm text-gray-500 mt-1">${order.phone || ''} | ${order.location || ''}</p>
                         </div>
-                        <div class="flex gap-1">
-                            <button onclick="deleteSingleOrder(${order.id})" class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition-colors">
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${s.badge}">${statusLabels[order.status] || order.status}</span>
+                            <button onclick="deleteSingleOrder(${order.id})" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors" title="سڕینەوەی داواکاری">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -525,11 +373,11 @@
 
         // ─── Save / Edit product ───────────────────────────────────────────
         window.saveProduct = async () => {
-            const name  = document.getElementById('prodName').value.trim();
+            const name = document.getElementById('prodName').value.trim();
             const price = parseFloat(document.getElementById('prodPrice').value);
-            const qty   = parseInt(document.getElementById('prodQty').value) || 0;
-            const desc  = document.getElementById('prodDesc').value.trim();
-            const img   = document.getElementById('prodImg').value.trim();
+            const qty = parseInt(document.getElementById('prodQty').value) || 0;
+            const desc = document.getElementById('prodDesc').value.trim();
+            const img = document.getElementById('prodImg').value.trim();
             if (!name || isNaN(price)) return alert('ناوی بەرهەم و نرخ بنووسە');
 
             let updatedProducts;
@@ -551,11 +399,11 @@
             if (!p) return;
             editingId = id;
             document.getElementById('modalTitle').textContent = 'دەستکاریکردنی بەرهەم';
-            document.getElementById('prodName').value  = p.name;
+            document.getElementById('prodName').value = p.name;
             document.getElementById('prodPrice').value = p.price;
-            document.getElementById('prodQty').value   = p.quantity;
-            document.getElementById('prodDesc').value  = p.description || '';
-            document.getElementById('prodImg').value   = p.image || '';
+            document.getElementById('prodQty').value = p.quantity;
+            document.getElementById('prodDesc').value = p.description || '';
+            document.getElementById('prodImg').value = p.image || '';
             toggleModal('productModal', true);
         };
 
@@ -568,13 +416,13 @@
         window.updateOrderStatus = async (oid, status) => {
             const order = storeData.orders.find(o => o.id === oid);
             if (!order) return;
-            const updatedOrders   = storeData.orders.map(o => o.id === oid ? { ...o, status } : o);
+            const updatedOrders = storeData.orders.map(o => o.id === oid ? { ...o, status } : o);
             const orderItems = toArray(order.items);
             const updatedProducts = storeData.products.map(p => {
                 const item = orderItems.find(i => i.productId === p.id);
                 if (item) {
-                    if (status === 'completed') return { ...p, pending: (p.pending||0) - item.quantity, sold: (p.sold||0) + item.quantity };
-                    if (status === 'cancelled')  return { ...p, pending: (p.pending||0) - item.quantity, quantity: p.quantity + item.quantity };
+                    if (status === 'completed') return { ...p, pending: (p.pending || 0) - item.quantity, sold: (p.sold || 0) + item.quantity };
+                    if (status === 'cancelled') return { ...p, pending: (p.pending || 0) - item.quantity, quantity: p.quantity + item.quantity };
                 }
                 return p;
             });
@@ -591,7 +439,7 @@
                 const orderItems = toArray(order.items);
                 updatedProducts = storeData.products.map(p => {
                     const item = orderItems.find(i => i.productId === p.id);
-                    if (item) return { ...p, pending: Math.max(0, (p.pending||0) - item.quantity), quantity: p.quantity + item.quantity };
+                    if (item) return { ...p, pending: Math.max(0, (p.pending || 0) - item.quantity), quantity: p.quantity + item.quantity };
                     return p;
                 });
             }
@@ -606,7 +454,7 @@
             storeData.orders.filter(o => o.status === 'pending').forEach(order => {
                 toArray(order.items).forEach(item => {
                     const p = updatedProducts.find(pr => pr.id === item.productId);
-                    if (p) { p.pending = Math.max(0, (p.pending||0) - item.quantity); p.quantity += item.quantity; }
+                    if (p) { p.pending = Math.max(0, (p.pending || 0) - item.quantity); p.quantity += item.quantity; }
                 });
             });
             await set(dbRef, { ...storeData, orders: [], nextOrderId: 1, products: updatedProducts });
@@ -614,8 +462,8 @@
 
         // ─── Reset sales stats ─────────────────────────────────────────────
         window.confirmReset = async () => {
-            const updatedProducts  = storeData.products.map(p => ({ ...p, sold: 0, pending: 0 }));
-            const remainingOrders  = storeData.orders.filter(o => o.status === 'pending');
+            const updatedProducts = storeData.products.map(p => ({ ...p, sold: 0, pending: 0 }));
+            const remainingOrders = storeData.orders.filter(o => o.status === 'pending');
             await set(dbRef, { ...storeData, products: updatedProducts, orders: remainingOrders });
             toggleModal('resetModal', false);
         };
@@ -623,58 +471,6 @@
         lucide.createIcons();
     </script>
 
-    </div><!-- End of #admin-content -->
-
-    <!-- ═══════════════════════════════════════════════════════════════════
-         LOGIN AUTHENTICATION SCRIPT
-         ═══════════════════════════════════════════════════════════════════ -->
-    <script>
-        // ──────────────────────────────────────────
-        //  🔑  CHANGE THESE TO YOUR OWN CREDENTIALS
-        // ──────────────────────────────────────────
-        const ADMIN_USERNAME = "admin";
-        const ADMIN_PASSWORD = "mypassword123";
-        // ──────────────────────────────────────────
-
-        function handleLogin() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-            const userInput = document.getElementById('login-username');
-            const passInput = document.getElementById('login-password');
-            const errorMsg  = document.getElementById('login-error-msg');
-            const btn = document.getElementById('login-submit-btn');
-
-            // Simulate loading
-            btn.textContent = 'Checking...';
-            btn.classList.add('loading');
-
-            setTimeout(() => {
-                if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                    // ✅ Success - Hide login, show dashboard
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('admin-content').classList.add('visible');
-                } else {
-                    // ❌ Failed
-                    userInput.classList.add('error');
-                    passInput.classList.add('error');
-                    errorMsg.classList.add('visible');
-                    btn.textContent = 'Sign In →';
-                    btn.classList.remove('loading');
-
-                    setTimeout(() => {
-                        userInput.classList.remove('error');
-                        passInput.classList.remove('error');
-                    }, 800);
-                }
-            }, 600);
-        }
-
-        // Allow Enter key to submit
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !document.getElementById('login-screen').classList.contains('hidden')) {
-                handleLogin();
-            }
-        });
-    </script>
 </body>
+
 </html>
