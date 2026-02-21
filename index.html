@@ -256,8 +256,28 @@
             </div>
             <textarea id="prodDesc" class="w-full p-3 border rounded-xl h-24 focus:outline-none focus:border-purple-400"
                 placeholder="وەسفی کورت"></textarea>
-            <input id="prodImg" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400"
-                placeholder="لینکی وێنە (URL)">
+            <!-- Image: upload from gallery OR paste a URL -->
+            <div class="space-y-2">
+                <!-- File picker -->
+                <label class="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-purple-300 rounded-xl cursor-pointer hover:bg-purple-50 transition-colors text-purple-600 font-semibold text-sm"
+                    id="imgPickerLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span id="imgPickerText">وێنە هەڵبژێرە لە گەلەری</span>
+                    <input id="prodImgFile" type="file" accept="image/*" class="hidden" onchange="handleImageFile(this)">
+                </label>
+                <!-- Preview -->
+                <div id="imgPreviewWrap" class="hidden">
+                    <img id="imgPreview" src="" class="w-full h-32 object-cover rounded-xl border" alt="preview">
+                </div>
+                <!-- URL fallback -->
+                <div class="flex items-center gap-2">
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                    <span class="text-xs text-gray-400">یان لینک بنووسە</span>
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                </div>
+                <input id="prodImg" class="w-full p-3 border rounded-xl focus:outline-none focus:border-purple-400 text-sm" dir="ltr"
+                    placeholder="https://..." oninput="handleImgUrlInput(this)">
+            </div>
             <button onclick="saveProduct()"
                 class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-purple-700 transition-colors">پاشەکەوتکردن</button>
             <button onclick="closeProductModal()"
@@ -444,6 +464,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAx6nZbWvHGkk0zRQdIVHbG2hmK29pWzAY",
@@ -457,7 +478,47 @@
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+        const storage = getStorage(app);
         const dbRef = ref(database, '/');
+
+        // ─── Image upload helpers ──────────────────────────────────────────
+        window.handleImageFile = async (input) => {
+            const file = input.files[0];
+            if (!file) return;
+            const label = document.getElementById('imgPickerText');
+            const preview = document.getElementById('imgPreview');
+            const previewWrap = document.getElementById('imgPreviewWrap');
+            // Show local preview immediately
+            const localUrl = URL.createObjectURL(file);
+            preview.src = localUrl;
+            previewWrap.classList.remove('hidden');
+            label.textContent = 'بارکردن...';
+            try {
+                const path = `products/${Date.now()}_${file.name}`;
+                const sRef = storageRef(storage, path);
+                await uploadBytes(sRef, file);
+                const downloadUrl = await getDownloadURL(sRef);
+                document.getElementById('prodImg').value = downloadUrl;
+                label.textContent = '✅ وێنەکە بارکرا';
+            } catch (e) {
+                label.textContent = '⚠️ هەڵە - دووبارە هەوڵبدەرەوە';
+                console.error('Upload error:', e);
+            }
+        };
+
+        window.handleImgUrlInput = (input) => {
+            const url = input.value.trim();
+            const preview = document.getElementById('imgPreview');
+            const previewWrap = document.getElementById('imgPreviewWrap');
+            if (url) {
+                preview.src = url;
+                previewWrap.classList.remove('hidden');
+                document.getElementById('imgPickerText').textContent = 'وێنە هەڵبژێرە لە گەلەری';
+                document.getElementById('prodImgFile').value = '';
+            } else {
+                previewWrap.classList.add('hidden');
+            }
+        };
 
         let storeData = { products: [], orders: [], nextOrderId: 1, nextProductId: 1 };
         let editingId = null;
@@ -471,6 +532,9 @@
             document.getElementById('modalTitle').textContent = 'زیادکردنی بەرهەم';
             ['prodName', 'prodDesc', 'prodImg'].forEach(id => document.getElementById(id).value = '');
             ['prodPrice', 'prodQty'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('prodImgFile').value = '';
+            document.getElementById('imgPickerText').textContent = 'وێنە هەڵبژێرە لە گەلەری';
+            document.getElementById('imgPreviewWrap').classList.add('hidden');
             toggleModal('productModal', true);
         };
         window.closeProductModal = () => toggleModal('productModal', false);
@@ -653,6 +717,15 @@
             document.getElementById('prodQty').value = p.quantity;
             document.getElementById('prodDesc').value = p.description || '';
             document.getElementById('prodImg').value = p.image || '';
+            document.getElementById('prodImgFile').value = '';
+            document.getElementById('imgPickerText').textContent = 'وێنە هەڵبژێرە لە گەلەری';
+            const previewWrap = document.getElementById('imgPreviewWrap');
+            if (p.image) {
+                document.getElementById('imgPreview').src = p.image;
+                previewWrap.classList.remove('hidden');
+            } else {
+                previewWrap.classList.add('hidden');
+            }
             toggleModal('productModal', true);
         };
 
