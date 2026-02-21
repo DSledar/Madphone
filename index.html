@@ -464,7 +464,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
 
         const firebaseConfig = {
             apiKey: "AIzaSyAx6nZbWvHGkk0zRQdIVHbG2hmK29pWzAY",
@@ -478,32 +478,35 @@
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-        const storage = getStorage(app);
         const dbRef = ref(database, '/');
 
-        // ─── Image upload helpers ──────────────────────────────────────────
-        window.handleImageFile = async (input) => {
+        // ─── Image upload helpers (base64 via Canvas — no Firebase Storage needed) ───
+        window.handleImageFile = (input) => {
             const file = input.files[0];
             if (!file) return;
             const label = document.getElementById('imgPickerText');
             const preview = document.getElementById('imgPreview');
             const previewWrap = document.getElementById('imgPreviewWrap');
-            // Show local preview immediately
-            const localUrl = URL.createObjectURL(file);
-            preview.src = localUrl;
-            previewWrap.classList.remove('hidden');
-            label.textContent = 'بارکردن...';
-            try {
-                const path = `products/${Date.now()}_${file.name}`;
-                const sRef = storageRef(storage, path);
-                await uploadBytes(sRef, file);
-                const downloadUrl = await getDownloadURL(sRef);
-                document.getElementById('prodImg').value = downloadUrl;
-                label.textContent = '✅ وێنەکە بارکرا';
-            } catch (e) {
-                label.textContent = '⚠️ هەڵە - دووبارە هەوڵبدەرەوە';
-                console.error('Upload error:', e);
-            }
+            label.textContent = 'چاوەڕوانبە...';
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const MAX = 600;
+                    let w = img.width, h = img.height;
+                    if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const base64 = canvas.toDataURL('image/jpeg', 0.75);
+                    document.getElementById('prodImg').value = base64;
+                    preview.src = base64;
+                    previewWrap.classList.remove('hidden');
+                    label.textContent = '✅ وێنەکە ئامادەیە';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         };
 
         window.handleImgUrlInput = (input) => {
